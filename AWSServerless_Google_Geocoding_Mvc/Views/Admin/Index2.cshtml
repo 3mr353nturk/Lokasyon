@@ -1,0 +1,129 @@
+﻿
+@{
+    ViewBag.Title = "Index2";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Lokasyon Gir
+                </header>
+                <div class="panel-body">
+                    <div class="form">
+                        @using (Html.BeginForm("AddMap", "Admin", FormMethod.Post, new { @id = "location-form", @class = "form-horizontal" }))
+                        {
+                            <div class="form-group">
+                                <label for="cname" class="control-label col-lg-1">Adres <span class="required">*</span></label>
+                                <div class="col-lg-10">
+                                    <input type="text" id="Address" name="Address" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cemail" class="control-label col-lg-1">Enlem</label>
+                                <div class="col-lg-10">
+                                    <input type="text" id="Latitude" name="Latitude" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="curl" class="control-label col-lg-1">Boylam</label>
+                                <div class="col-lg-10">
+                                    <input type="hidden" id="User" name="User" value="@ViewBag.user" />
+                                    <input type="hidden" id="LastFileName" name="LastFileName" value="@ViewBag.LastFileName" />
+                                    <input type="hidden" id="PrevFileName" name="PrevFileName" value="@ViewBag.PrevFileName" />
+                                    <input type="hidden" id="BeforeFileName" name="BeforeFileName" value="@ViewBag.BeforeFileName" />
+                                    <input type="text" id="Longitude" name="Longitude" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="text-right" style="padding-right:140px">
+                                    <div class="col-lg-offset-2 col-lg-10">
+                                        <button type="button" id="show" class="btn btn-default"><i class="fa fa-eye" aria-hidden="true"></i> Göster</button>
+                                        <button type="submit" id="save" class="btn btn-primary"><i class="fa fa-floppy-o" aria-hidden="true"></i> Kaydet</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="col-lg-12">
+                        @*@using (Html.BeginForm("UploadFile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            <div class="form-group mb-3">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="FileUpload" name="FileUpload">
+                                    <label class="custom-file-label" for="FileUpload"></label>
+                                </div>
+                            </div>
+                            <button type="submit" id="Submit" class="btn btn-primary"><i class="fa fa-upload" aria-hidden="true"></i> Yükle</button>
+                            <button type="button" id="export" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel'e Aktar</button>
+
+                            <br /><br />
+                            <ul id="ulList"></ul>
+                        }*@
+                        @using (Html.BeginForm("Index", "Admin", FormMethod.Post, new { enctype = "multipart/form-data", id = "Myform" }))
+                        {
+                            <div class="form-group mb-3">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="FileUpload" name="FileUpload">
+                                    <label class="custom-file-label" for="FileUpload"></label>
+                                </div>
+                            </div>
+                            <input type="hidden" id="lat" name="lat" value="" />
+                            <input type="hidden" id="lng" name="lng" value="" />
+                            <button type="submit" id="Submit" class="btn btn-primary"><i class="fa fa-upload" aria-hidden="true"></i> Yükle</button>
+                            <button type="button" id="export" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel'e Aktar</button>
+                            <button type="button" id="exportt" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel Şablonu İndir</button>
+                            <br /><br />
+                            <ul id="ulList"></ul>
+                        }
+
+                        @*<form enctype="multipart/form-data" method="post">
+                            <dl>
+                                <dt>
+                                    <label asp-for="FileUpload.FormFile"></label>
+                                </dt>
+                                <dd>
+                                    <input asp-for="FileUpload.FormFile" type="file">
+                                    <span asp-validation-for="FileUpload.FormFile"></span>
+                                </dd>
+                            </dl>
+                            <input asp-page-handler="Upload" class="btn" type="submit" value="Upload" />
+                        </form>*@
+
+                        @*@using (Html.BeginForm("Export", "Admin", FormMethod.Post, new { enctype = "multipart/form-data", id = "Myformm" }))
+                        {*@
+                        <div class="form-group">
+                            <label>Son yüklenen excel dosyası:</label>
+                            @*<label id="label"></label>*@
+
+                            <input id="txtBox" type="text" class="form-control" name="FileUploadd" />
+                            <input type="hidden" id="onceki" value="@ViewBag.onceki" />
+                            <input type="hidden" id="oncekii" value="@ViewBag.oncekii" />
+                            <input type="hidden" id="lati" value="@ViewBag.lat" />
+                            <input type="hidden" id="longi" value="@ViewBag.lng" />
+                            <input type="hidden" id="adres" value="@ViewBag.address" />
+                            @*<input type="file" class="custom-file-input" id="FileUploadd" name="FileUpload">*@
+                        </div>
+                        <button type="button" id="Submitt" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel'e Aktar</button>
+                        @*}*@
+                    </div>
+                    <br />
+                    <div class="progress progress-panel">
+                        <div id="myBar" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <br />
+                    <div class="card" id="formatted-address">
+
+                    </div>
+                    <div class="card" id="address-components">
+
+                    </div>
+                    <div class="card" id="geometry">
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+

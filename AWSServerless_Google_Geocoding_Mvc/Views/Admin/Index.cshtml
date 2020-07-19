@@ -1,0 +1,824 @@
+﻿@model IEnumerable<AWSServerless_Google_Geocoding_Mvc.Models.Map>
+@using Newtonsoft.Json;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+
+    var lst = ViewBag.Count as List<AWSServerless_Google_Geocoding_Mvc.Models.Map>;
+
+    //System.Web.Script.Serialization.JavaScriptSerializer ser = new System.Web.Script.Serialization.JavaScriptSerializer();
+
+    //var myData = ser.Serialize(ViewBag.onceki);
+    var data = ViewBag.onceki;
+}
+
+<style type="text/css">
+    @@keyframes spinner-border {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: text-bottom;
+        border: .25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        -webkit-animation: spinner-border .75s linear infinite;
+        animation: spinner-border .75s linear infinite;
+    }
+
+    .spinner-border-sm {
+        height: 1rem;
+        border-width: .2em;
+    }
+</style>
+<link href="~/Content/DataTables-1.10.21/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                Lokasyon Gir
+            </header>
+            <div class="panel-body">
+                <div class="form">
+                    @using (Html.BeginForm("AddMap", "Admin", FormMethod.Post, new { @id = "location-form", @class = "form-horizontal" }))
+                    {
+                        <div class="form-group">
+                            <label for="cname" class="control-label col-lg-1">Adres <span class="required">*</span></label>
+                            <div class="col-lg-10">
+                                <input type="text" id="Address" name="Address" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cemail" class="control-label col-lg-1">Enlem</label>
+                            <div class="col-lg-10">
+                                <input type="text" id="Latitude" name="Latitude" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="curl" class="control-label col-lg-1">Boylam</label>
+                            <div class="col-lg-10">
+                                <input type="hidden" id="User" name="User" value="@ViewBag.user" />
+                                <input type="hidden" id="LastFileName" name="LastFileName" value="@ViewBag.LastFileName" />
+                                <input type="hidden" id="PrevFileName" name="PrevFileName" value="@ViewBag.PrevFileName" />
+                                <input type="hidden" id="BeforeFileName" name="BeforeFileName" value="@ViewBag.BeforeFileName" />
+                                <input type="text" id="Longitude" name="Longitude" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-right" style="padding-right:140px">
+                                <div class="col-lg-offset-2 col-lg-10">
+                                    <button type="button" id="show" class="btn btn-default"><i class="fa fa-eye" aria-hidden="true"></i> Göster</button>
+                                    <button type="submit" id="save" class="btn btn-primary"><i class="fa fa-floppy-o" aria-hidden="true"></i> Kaydet</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="col-lg-12">
+                    @using (Html.BeginForm("Index", "Admin", FormMethod.Post, new { enctype = "multipart/form-data", id = "Myform" }))
+                    {
+                        <div class="form-group mb-3">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="FileUpload" name="FileUpload">
+                                <label class="custom-file-label" for="FileUpload"></label>
+                            </div>
+                        </div>
+                        <input type="hidden" id="items" name="items" value="" />
+                        <button type="submit" id="Submit" class="btn btn-primary"><i class="fa fa-upload" aria-hidden="true"></i> Yükle</button>
+                        <button type="button" id="export" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel'e Aktar</button>
+                        <button type="button" id="exportt" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel Şablonu İndir</button>
+                        <br /><br />
+                        <ul id="ulList"></ul>
+                    }
+
+                    <div class="form-group">
+                        <label>Son yüklenen excel dosyası:</label>
+
+                        <input id="txtBox" type="text" class="form-control" name="FileUploadd" />
+                        <input type="hidden" id="onceki" value="@ViewBag.onceki" />
+                        <input type="hidden" id="oncekii" value="@ViewBag.oncekii" />
+                        <input type="hidden" id="lati" value="@ViewBag.lat" />
+                        <input type="hidden" id="longi" value="@ViewBag.lng" />
+                        <input type="hidden" id="adres" value="@ViewBag.address" />
+                    </div>
+                    <button type="button" id="Submitt" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel'e Aktar</button>
+                </div>
+                <br />
+                <div class="progress progress-panel">
+                    <div id="myBar" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <br />
+                <div class="card" id="formatted-address">
+
+                </div>
+                <div class="card" id="address-components">
+
+                </div>
+                <div class="card" id="geometry">
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                Lokasyon Listesi
+            </header>
+
+            <table class="table table-striped table-advance table-hover" id="mapTable">
+                <thead>
+                    <tr>
+                        <th><i class="fa fa-globe" aria-hidden="true"></i> Enlem</th>
+                        <th><i class="fa fa-compass"></i> Boylam</th>
+                        <th><i class="icon_pin_alt"></i> Adres</th>
+                    </tr>
+                </thead>
+                <tbody id="tblIcerik">
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/Content/DataTables-1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/DataTables-1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+    <script type="text/javascript">
+    //geocode();
+    //get location form
+
+        var locationForm = document.getElementById('location-form');
+
+    //listen for submitform
+    //locationForm.on('submit', geocode);
+
+    $("#show").on('click', function () {
+        geocode();
+    });
+
+        $("#save").on('click', function () {
+            setTimeout(function () {
+                swal({
+                    title: "Başarılı!",
+                    text: "Kayıt Başarılı!",
+                    type: "success",
+                    showCancelButtonClass: "btn-primary",
+                    confirmButtonText: "OK"
+                });
+            }, 2000);
+        });
+
+        var html = "";
+        function showMap() {
+
+
+            $('#mapTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                },
+                "searching": true,
+                "lengthChange": true,
+                "bInfo": true,
+                "processing": true, // for show progress bar
+                //"serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "responsive": true,
+                "paging": true,
+                "bDestroy": true,
+                "ajax": {
+                    "url": "/Admin/GetMaps/",
+                    "type": "GET",
+                    "datatype": "json",
+                    "dataSrc": ""
+                },
+                "columns": [
+                    {
+                        "data": "Latitude", "name": "Latitude", "autoWidth": true
+                    },
+                    {
+                        "data": "Longitude", "name": "Longitude", "autoWidth": true
+                    },
+                    { "data": "Address", "name": "Address", "autoWidth": true },
+                ],
+            });
+
+
+
+        }
+
+
+    var input = document.getElementById("FileUpload");
+    var file_input_label = document.getElementById("file_input_label");
+    var loading_btn = document.getElementById("loading_btn");
+    $("#export").prop("disabled", true);
+    var bar = $('.progress-bar');
+    var percent = $('.percent');
+    var status = $('#status');
+    var files = $("#FileUpload").get(0).files;
+
+
+    var progress = $('.progress');
+    var progressBar = $('.progress-bar');
+    var percentVal = '0%';
+    var percentValTen = '10%';
+    var percentValThirteen = '30%';
+    var percentValOneHundred = '100%';
+    var loader_icon = $("#loader-icon");
+
+    var current_progress = 0,
+        step = 0.5; // the smaller this is the slower the progress bar
+
+        function noFiles() {
+            if (document.getElementById("FileUpload").files.length == 0) {
+                alert("Dosya seçilmedi!");
+            }
+        }
+
+            $('#Myform').ajaxForm({
+                beforeSend: function () {
+                    noFiles();
+                    $("#ulList").empty();
+                    $('.progress-bar').width(percentVal);
+                    loader_icon.show();
+                },
+                uploadProgress: function (event, position, total, percentComplete) {
+                    var fp = $("#FileUpload");
+                    var lg = fp[0].files.length; // get length
+                    var items = fp[0].files;
+                    var fragment = "";
+                    // disable button
+                    $("#Submit").prop("disabled", true);
+                    // add spinner to button
+                    $("#Submit").html(
+                        `<span style="@@keyframes spinner-border {
+      to { transform: rotate(360deg); }
+    }
+    .spinner-border{
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: text-bottom;
+        border: .25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        -webkit-animation: spinner-border .75s linear infinite;
+        animation: spinner-border .75s linear infinite;
+    }
+    .spinner-border-sm{
+        height: 1rem;
+        border-width: .2em;
+    }" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Yükleniyor...`
+                    );
+                    if (lg > 0) {
+
+                        fragment += "<li> Veriler yükleniyor..</li>";
+
+                        $("#ulList").append(fragment);
+                        for (var i = 0; i < lg; i++) {
+                            var i = 0;
+                            if (i == 0) {
+                                i = 1;
+                                var elem = document.getElementById("myBar");
+                                var width = 0;
+                                var id = setInterval(frame, 100);
+                                function frame() {
+                                    if (width >= 100) {
+                                        swal({
+                                            title: "Başarılı!",
+                                            text: "Kayıt Başarılı!",
+                                            type: "success",
+                                            showCancelButtonClass: "btn-primary",
+                                            confirmButtonText: "OK"
+                                        });
+                                        clearInterval(id);
+                                        i = 0;
+                                        elem.style.width = "0%";
+                                        $("#Submit").prop("disabled", false);
+                                        $("#export").prop("disabled", false);
+                                        $("#Submit").html("Yükle");
+                                        $("#ulList").empty();
+                                        var lastFile =$("#onceki").val();
+                                        console.log(lastFile);
+                                        var prevFile = $("#oncekii").val();
+                                        console.log(prevFile);
+                                        $.cookie('oncekiYuklenenDosya', lastFile, { expires: 365 });
+                                        $.cookie('dahaOncekiYuklenenDosya', prevFile, { expires: 365 });
+
+                                        @*//$.get de olabilir ya da api url verilip o şekilde de denenebilir.
+                                        $.ajax({
+                                            type: "GET",
+                                            url: '@Url.Action("AddMap","Admin")',
+                                            success: function (data) {
+                                                console.log(data);
+                                            },
+                                            error: function (error) {
+                                                alert(error);
+                                            }
+                                        });*@
+
+                                        //var myUrl = "http://localhost:53583/api/address/save";
+                                        //var formFile = new FormData();
+                                        //formFile.append("FileUpload", $("#FileUpload").file);
+                                        //$.ajax({
+                                        //    type: "POST",
+                                        //    url: myUrl,
+                                        //    data: formFile,
+                                        //    crossDomain: true,
+                                        //    processData: false,
+                                        //    contentType: "multipart/form-data",
+                                        //    dataType:"json",
+                                        //    headers: {
+                                        //        //Authorization: "Bearer " + accesstoken,
+                                        //        'Access-Control-Allow-Origin': '*'
+                                        //    },
+                                        //    success: function (data) {
+                                        //        $.ajax({
+                                        //            type: "POST",
+                                        //            url: "http://localhost:53583/api/address/import",
+                                        //            data: data,
+                                        //            success: function (result) {
+                                        //                if (result == ok) {
+                                        //                    console.log(result);
+                                        //                }
+                                        //            }
+                                        //        });
+                                        //    },
+                                        //    error: function (error) {
+                                        //        alert(error);
+                                        //    }
+                                        //});
+                                        //getLatLng(d[i + 1].Adres, function (lat, lng) {
+                                        //    if (lat != '' && lng != '') {
+                                        //        console.log(lat);
+                                        //        console.log(lng);
+                                        //        document.getElementById('lat').value = lat;
+                                        //        document.getElementById('lng').value = lng;
+                                        //        //$('#myForm').submit(function (event) {
+                                        //        //    event.preventDefault();
+                                        //        //    var form = $(this);
+                                        //        //    console.log(form.serialize());
+                                        //        //    $.ajax({
+                                        //        //        type: form.attr('method'),
+                                        //        //        url: form.attr('action'),
+                                        //        //        data: form.serialize()
+                                        //        //    });
+                                        //        //});
+                                        //    }
+                                        //});
+                                        showMap();
+                                    } else {
+                                        width++;
+                                        elem.style.width = width + "%";
+                                        elem.innerHTML = width + "%";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                complete: function (xhr) {
+                    if (xhr.success == true) {
+
+                        swal({
+                            title: "Başarılı!",
+                            text: "Kayıt Başarılı!",
+                            type: "success",
+                            showCancelButtonClass: "btn-primary",
+                            confirmButtonText: "OK"
+                        });
+
+
+                        //SonEklenenDosya();
+
+                    }
+                }
+
+            });
+
+        //dosya seçiliyor. 
+        $('input[type="file"]').change(function (e) {
+            handleFileSelect(e);
+            var fileName = e.target.files[0].name;
+            $.removeCookie('sonYuklenenDosya');
+            $.cookie('sonYuklenenDosya', e.target.files[0].name, { expires: 365 });
+            var lastFile =$("#onceki").val();
+            console.log(lastFile);
+            var prevFile = $("#oncekii").val();
+            console.log(prevFile);
+            $.cookie('oncekiYuklenenDosya', lastFile, { expires: 365 });
+            $.cookie('dahaOncekiYuklenenDosya', prevFile, { expires: 365 });
+            var dosyaYolu = $.cookie('sonYuklenenDosya');
+            $("#txtBox").val(dosyaYolu);
+        });
+
+
+        //seçilen excel dosyası json'a dönüştürülüyor.
+
+        function handleFileSelect(evt) {
+
+            var files = evt.target.files; // FileList object
+            var xl2json = new ExcelToJSON();
+            xl2json.parseExcel(files[0]);
+        }
+
+        //exceldeki adreslerin lokasyonunu bulan yer
+
+        var ExcelToJSON = function () {
+
+            this.parseExcel = function (file) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var data = e.target.result;
+                    var workbook = XLSX.read(data, {
+                        type: 'binary'
+                    });
+
+                    workbook.SheetNames.forEach(function (sheetName) {
+                        // Here is your object
+                        var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+                        var json_object = JSON.stringify(XL_row_object);
+                        console.log(json_object);
+                        var d = JSON.parse(json_object);
+                        console.log(d);
+
+                        for (var i = 0; i <= d.length; i++) {
+
+                            $.each(d[i + 1], function (IndexNo, Deger) {
+                                console.log(Deger);
+
+                                //json olarak gelen adresler fonksiyona gönderiliyor. adreslerin enlem ve boylamları bulunuyor.
+                                getLatLng(d[i + 1].Adres, function (lat, lng) {
+                                    if (lat != '' && lng != '') {
+                                        console.log(lat);
+                                        console.log(lng);
+
+                                        document.getElementById('lat').value = lat;
+                                        document.getElementById('lng').value = lng;
+                                    }
+
+                                    var maps = [
+                                        { lat: lat },
+                                        { lng: lng }
+                                    ];
+
+                                    maps = JSON.stringify({ 'maps': maps });
+
+                                    console.log(maps);
+
+                                    var maplist = new Array();
+
+                                    maplist[0] = lat;
+                                    maplist[1] = lng;
+
+                                    var maplst = new Array();
+
+                                    $.each(maplist, function () {
+                                        var map = {};
+                                        map.Latitude = maplist[0];
+                                        map.Longitude = maplist[1];
+                                        maplst.push(map);
+                                        console.log(map);
+                                        //document.getElementById('items').value = map;
+                                    });
+
+                                    //document.getElementById('items').value = map;
+
+                                });
+
+                            });
+
+                        }
+
+                    })
+
+                };
+
+                reader.onerror = function (ex) {
+                    console.log(ex);
+                };
+
+                reader.readAsBinaryString(file);
+            };
+        };
+
+
+        //gelen adres datalarına göre enlem ve boylamlar bulunuyor.
+        function getLatLng(address, fn) {
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+                params: {
+                    address: address,
+                    key: 'AIzaSyA1XKIDyLIR82RZSXzizzqmmU8BKE-NhVo'
+                }
+            }).then(function (response) {
+                fn(response.data.results[0].geometry.location.lat, response.data.results[0].geometry.location.lng);
+            })
+        }
+
+
+       
+
+
+
+
+                                    ////Send the JSON array to Controller using AJAX.
+                                    //$.ajax({
+                                    //    type: "POST",
+                                    //    url: "/Admin/InsertCustomers",
+                                    //    data: JSON.stringify(customers),
+                                    //    contentType: "application/json; charset=utf-8",
+                                    //    dataType: "json",
+                                    //    success: function (r) {
+                                    //        alert(r + " record(s) inserted.");
+                                    //    }
+                                    //});
+
+                                   //$.ajax({
+                                   //     type: "POST",
+                                   //     url: '/Admin/Index/',
+                                   //     data: postData,
+                                   //     success: function(data){
+                                   //         //console.log(data.Result);
+                                   //     },
+                                   //     traditional: true
+                                   // });
+
+                                   // //console.log(postData);
+
+                                   // //console.log(maplist);
+
+                                   // var list = new Array();
+                                   // $.each(maplist,function (index, deger) {
+                                   //     list[index] = deger;
+                                   // });
+                                   // //console.log(list);
+
+                                   // var arr = maplist;
+
+                                   // arr.forEach(function (elem, index) {
+
+                                   //     console.log(`${index} . ${elem}`);
+                                   // });
+
+                                    //for (var i = 0; i < maps.length; i++) {
+
+
+                                    //}
+
+
+
+                                    //document.getElementById('lat').value = lat;
+                                    //document.getElementById('lng').value = lng;
+
+
+
+
+                                //console.log(lat);
+                                //console.log(lng);
+                                //document.getElementById('lat').value = lat;
+                                //document.getElementById('lng').value = lng;
+                 
+
+
+
+                        //for (var i = 0; i <= d.length; i++) {
+
+                        //    //document.getElementById('Address').value = d[i + 1].Adres;
+                        //    //document.getElementById('adres').value = d[i + 1].Adres;
+                        //    //geocode2();
+                        //    getLatLng(d[i + 1].Adres, function (lat, lng) {
+                        //        if (lat != '' && lng != '') {
+                        //            console.log(lat);
+                        //            console.log(lng);
+
+
+                        //            //document.getElementById('lat').value = lat;
+                        //            //document.getElementById('lng').value = lng;
+
+                        //            //for (var j = 0; j <= d.length; j++) {
+
+                        //            //    $.each(d[j],
+                        //            //        function (IndexNo, Deger) {
+
+                        //            //            console.log(Deger);
+                        //            //            //console.log(lat);
+                        //            //            //console.log(lng);
+                        //            //            //document.getElementById('lat').value = lat;
+                        //            //            //document.getElementById('lng').value = lng;
+                        //            //        }
+                        //            //    );
+                        //            //}
+
+
+                        //            //document.getElementById('lat').value = lat;
+                        //            //document.getElementById('lng').value = lng;
+                        //            //$('#Myform').submit(function (event) {
+                        //            //    event.preventDefault();
+                        //            //    var form = $(this);
+                        //            //    //console.log(form.serialize());
+                        //            //    $.ajax({
+                        //            //        type: form.attr('method'),
+                        //            //        url: form.attr('action'),
+                        //            //        data: form.serialize()
+                        //            //    });
+                        //            //});
+                        //        }
+                        //    });
+                        //}
+
+
+     
+
+        
+
+    $("#export").on('click', function () {
+        Export();
+    });
+
+    $("#exportt").on('click', function () {
+        Exportt();
+    });
+
+    $("#Submitt").on('click', function () {
+        Export();
+    });
+
+    function Export()
+    {
+        var filename = $('input[type=file]').val().split('\\').pop();
+        GetRequestedData("/Admin/SonExport/?fileName=" + filename);
+        window.open("/Admin/SonExport/?fileName=" + filename);
+    }
+
+    function Exportt()
+    {
+        GetRequestedData("/Admin/ExportToExcell/");
+        window.open("/Admin/ExportToExcell/");
+    }
+
+        function GetRequestedData(url) {
+            $.ajax({
+                url: url,
+                async: false,
+                type: 'GET',
+                success: function (data) {
+                    resultData = data; // here I am getting this UMS.Entities.Role
+                },
+                error: function (error) {
+                    alert(error.statusText);
+                }
+            });
+
+        }
+
+    function geocode() {
+        //prevent actual submit
+
+        var location = document.getElementById('Address').value;
+        axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+            params: {
+                address: location,
+                key: 'AIzaSyA1XKIDyLIR82RZSXzizzqmmU8BKE-NhVo'
+            }
+        })
+            .then(function (response) {
+                //log full response
+                console.log(response);
+
+                //formatted address
+                var formattedAddress = response.data.results[0].formatted_address;
+                var formattedAddressOutput =
+                    '<ul class="list-group">' +
+                    '<li class="list-group-item">' + formattedAddress + '</li>' +
+                    '</ul>';
+
+                //address components
+                var addressComponents = response.data.results[0].address_components;
+                var addressComponentsOutput =
+                    '<ul class="list-group">';
+                for (var i = 0; i < addressComponents.length; i++) {
+                    addressComponentsOutput += '<li class="list-group-item"><strong>' + addressComponents[i].types[0] + '</strong>: ' + addressComponents[i].long_name + ' </li>';
+                }
+                addressComponentsOutput += '</ul>';
+
+                //geometry
+                var lat = response.data.results[0].geometry.location.lat;
+                var lng = response.data.results[0].geometry.location.lng;
+                var geometryOutput =
+                    '<ul class="list-group">' +
+                    '<li class="list-group-item"><strong>Latitude</strong>: ' + lat + '</li>' +
+                    '<li class="list-group-item"><strong>Longitude</strong>: ' + lng + '</li>' +
+                    '</ul>';
+                document.getElementById('lat').value = lat;
+                document.getElementById('lng').value = lng;
+
+                document.getElementById('formatted-address').innerHTML = formattedAddressOutput;
+                document.getElementById('Address').value = formattedAddress;
+                document.getElementById('address-components').innerHTML = addressComponentsOutput;
+                document.getElementById('geometry').innerHTML = geometryOutput;
+                document.getElementById('Latitude').value = lat;
+                document.getElementById('Longitude').value = lng;
+
+            })
+            .catch(function (error) {
+                console.log(error);
+                swal({
+                    title: "Hata!",
+                    text: "Hata Oluştu!",
+                    type: "error",
+                    showCancelButtonClass: "btn-danger",
+                    confirmButtonText: "OK"
+                });
+            });
+        }
+
+        function geocode2() {
+            //prevent actual submit
+
+
+            var location = document.getElementById('Address').value;
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+                params: {
+                    address: location,
+                    key: 'AIzaSyA1XKIDyLIR82RZSXzizzqmmU8BKE-NhVo'
+                }
+            })
+                .then(function (response) {
+                    //log full response
+                    console.log(response);
+
+                    //formatted address
+                    var formattedAddress = response.data.results[0].formatted_address;
+                    var formattedAddressOutput =
+                        '<ul class="list-group">' +
+                        '<li class="list-group-item">' + formattedAddress + '</li>' +
+                        '</ul>';
+
+                    //address components
+                    var addressComponents = response.data.results[0].address_components;
+                    var addressComponentsOutput =
+                        '<ul class="list-group">';
+                    for (var i = 0; i < addressComponents.length; i++) {
+                        addressComponentsOutput += '<li class="list-group-item"><strong>' + addressComponents[i].types[0] + '</strong>: ' + addressComponents[i].long_name + ' </li>';
+                    }
+                    addressComponentsOutput += '</ul>';
+
+                    //geometry
+                    var lat = response.data.results[0].geometry.location.lat;
+                    var lng = response.data.results[0].geometry.location.lng;
+                    var geometryOutput =
+                        '<ul class="list-group">' +
+                        '<li class="list-group-item"><strong>Latitude</strong>: ' + lat + '</li>' +
+                        '<li class="list-group-item"><strong>Longitude</strong>: ' + lng + '</li>' +
+                        '</ul>';
+                    document.getElementById('lat').value = lat;
+                    document.getElementById('lng').value = lng;
+
+                    document.getElementById('formatted-address').innerHTML = formattedAddressOutput;
+                    document.getElementById('Address').value = formattedAddress;
+                    document.getElementById('address-components').innerHTML = addressComponentsOutput;
+                    document.getElementById('geometry').innerHTML = geometryOutput;
+                    document.getElementById('Latitude').value = lat;
+                    document.getElementById('Longitude').value = lng;
+
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    swal({
+                        title: "Hata!",
+                        text: "Hata Oluştu!",
+                        type: "error",
+                        showCancelButtonClass: "btn-danger",
+                        confirmButtonText: "OK"
+                    });
+                });
+        }
+
+
+        SonEklenenDosya();
+        function SonEklenenDosya() {
+            $("#txtBox").empty();
+            $("#txtBox").val($.cookie('sonYuklenenDosya'));
+        }
+    </script>
+
+}

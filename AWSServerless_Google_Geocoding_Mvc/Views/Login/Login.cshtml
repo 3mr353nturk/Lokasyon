@@ -1,0 +1,119 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Paneli Giriş | Tezmaksan Lokasyon Bul">
+    <meta name="author" content="Tezmaksan">
+    <meta name="keyword" content="Admin Paneli Giriş | Tezmaksan Lokasyon Bul">
+
+    <title>Admin Paneli Giriş Sayfası</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="~/Content/NiceAdmin/css/bootstrap.min.css" rel="stylesheet">
+    <!-- bootstrap theme -->
+    <link href="~/Content/NiceAdmin/css/bootstrap-theme.css" rel="stylesheet">
+    <!--external css-->
+    <!-- font icon -->
+    <link href="~/Content/NiceAdmin/css/elegant-icons-style.css" rel="stylesheet" />
+    <link href="~/Content/NiceAdmin/css/font-awesome.css" rel="stylesheet" />
+    <!-- Custom styles -->
+    <link href="~/Content/NiceAdmin/css/style.css" rel="stylesheet">
+    <link href="~/Content/NiceAdmin/css/style-responsive.css" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+      <![endif]-->
+    <!-- =======================================================
+      Theme Name: NiceAdmin
+      Theme URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+      Author: BootstrapMade
+      Author URL: https://bootstrapmade.com
+    ======================================================= -->
+</head>
+
+<body class="login-img3-body">
+    <div class="container">
+        @using (Html.BeginForm("Token", "Login", FormMethod.Post, new { @class = "login-form" }))
+        {
+            @Html.AntiForgeryToken()
+        @*<form class="login-form">*@
+            <div class="login-wrap">
+                <p class="login-img"><i class="icon_lock_alt"></i></p>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="icon_profile"></i></span>
+                    <input type="text" class="form-control" id="Username" name="username" placeholder="Kullanıcı Adı" autofocus="">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="icon_key_alt"></i></span>
+                    <input type="password" class="form-control" id="Password" name="password" placeholder="Şifre">
+                </div>
+                @*<label class="checkbox">
+                <input type="checkbox" value="remember-me"> Beni Hatırla
+                <span class="pull-right"> <a href="#"> Şifremi Unuttum?</a></span>
+            </label>*@
+                <button class="btn btn-primary btn-lg btn-block" type="submit" id="btnLogin"><i class="fa fa-sign-in" aria-hidden="true"></i> Giriş Yap</button>
+                <br /><br />
+                <div class="form-group m-b-0 m-t-10 ">
+                    <div class="col-sm-12 text-center ">
+                        Henüz kayıt olmadınız mı? <a href="/Login/Register" class="text-info m-l-5 "><b>Kayıt Ol</b></a>
+                    </div>
+                </div>
+            </div>
+        @*</form>*@
+        }
+            
+    </div>
+</body>
+</html>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnLogin").on('click', function () {
+
+            let username = $("#Username").val();
+            let password = $("#Password").val();
+
+            let user = { "Username": username, "Password": password };
+
+            var url = "https://cp7u0uz8r9.execute-api.eu-west-2.amazonaws.com/Prod/api/login/accesstoken";
+
+            var newUrl = '@Url.Action("Index","Admin")';
+            var oldUrl = '@Url.Action("Login","Login")';
+
+            $.ajax({
+                type: "POST",
+                crossDomain: true,
+                url: url,
+                data: JSON.stringify(user),
+                success: function (data) {
+                    console.table(data);
+                    localStorage.setItem("token", data.token);
+                    ////sessionStorage.setItem("UserID", $("#UserID").val());
+                    //sessionStorage.setItem("Username", $("#Username").val());
+                    //window.location.href = newUrl;
+                },
+                error: function (data) {
+                    console.log(data);
+                    //window.location.href = oldUrl;
+                },
+                contentType: "application/json",
+                dataType: "json"
+
+            });
+        });
+    });
+</script>
+
+
