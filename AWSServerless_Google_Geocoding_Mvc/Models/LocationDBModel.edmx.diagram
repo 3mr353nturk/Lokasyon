@@ -6,7 +6,7 @@
     <edmx:Diagrams>
       <Diagram DiagramId="be891d673fed48718cc4e92dca0eebcd" Name="Diagram1">
         <EntityTypeShape EntityType="LocationDBModel.Map" Width="1.5" PointX="3" PointY="1" />
-        <EntityTypeShape EntityType="LocationDBModel.User" Width="1.5" PointX="0.75" PointY="2.25" />
+        <EntityTypeShape EntityType="LocationDBModel.User" Width="1.5" PointX="0.75" PointY="1.875" />
         <AssociationConnector Association="LocationDBModel.FK_Map_User" />
       </Diagram>
     </edmx:Diagrams>

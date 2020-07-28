@@ -11,9 +11,6 @@
           <ScalarProperty Name="ModifyUser" ColumnName="ModifyUser" />
           <ScalarProperty Name="ModifyUserId" ColumnName="ModifyUserId" />
           <ScalarProperty Name="FileCount" ColumnName="FileCount" />
-          <ScalarProperty Name="BeforeFileName" ColumnName="BeforeFileName" />
-          <ScalarProperty Name="PrevFileName" ColumnName="PrevFileName" />
-          <ScalarProperty Name="LastFileName" ColumnName="LastFileName" />
           <ScalarProperty Name="FileName" ColumnName="FileName" />
           <ScalarProperty Name="ExcelPath" ColumnName="ExcelPath" />
           <ScalarProperty Name="Address" ColumnName="Address" />

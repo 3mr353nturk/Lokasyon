@@ -28,12 +28,11 @@
                         <th><i class="fa fa-compass"></i> Boylam</th>
                         <th><i class="icon_pin_alt"></i> Adres</th>
                         @*<th><i class="fa fa-file" aria-hidden="true"></i> Dosya Adı</th>
-                        <th><i class="fa fa-user" aria-hidden="true"></i> Yükleyen Kişi</th>
-                        <th><i class="fa fa-calendar" aria-hidden="true"></i> Yüklenme Tarihi</th>*@
+                            <th><i class="fa fa-user" aria-hidden="true"></i> Yükleyen Kişi</th>
+                            <th><i class="fa fa-calendar" aria-hidden="true"></i> Yüklenme Tarihi</th>*@
                     </tr>
                 </thead>
                 <tbody id="tblIcerik">
-                   
                 </tbody>
             </table>
             @*<button type="button" id="export" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel'e Aktar</button>*@
@@ -49,39 +48,41 @@
             showMap();
             var html = "";
             function showMap() {
-                var url = "https://cp7u0uz8r9.execute-api.eu-west-2.amazonaws.com/Prod/api/address/getmaplist";
-                var accesstoken = localStorage.getItem("token");
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    crossDomain: true,
-                    headers: {
-                        Authorization: "Bearer " + accesstoken,
-                        'Access-Control-Allow-Origin': '*'
+
+                $('#mapTable').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
                     },
-                    success: function (data) {
-                        $.each(data, function (i, item) {
-                            console.log(item.latitude);
-                            html += '<tr>' +
-                                '<td>' + item.latitude + '</td>' +
-                                '<td>' + item.longitude + '</td>' +
-                                '<td>' + item.address + '</td>' +
-                                '</tr>';
-                        });
-                        $("#tblIcerik").append(html);
-                        $("#mapTable").DataTable({
-                            "language": {
-                                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
-                            }
-                        });
+                    "searching": true,
+                    "lengthChange": true,
+                    "bInfo": true,
+                    "processing": true, // for show progress bar
+                    //"serverSide": true, // for process server side
+                    "filter": true, // this is for disable filter (search box)
+                    "orderMulti": false, // for disable multiple column at once
+                    "responsive": true,
+                    "paging": true,
+                    "bDestroy": true,
+                    "ajax": {
+                        "url": "/Admin/GetMapss/",
+                        "type": "GET",
+                        "datatype": "json",
+                        "dataSrc": ""
                     },
-                    error: function (error) {
-                        console.log(error);
-                    },
-                    contentType: "application/json",
-                    dataType: "json"
+                    "columns": [
+                        {
+                            "data": "Latitude", "name": "Latitude", "autoWidth": true
+                        },
+                        {
+                            "data": "Longitude", "name": "Longitude", "autoWidth": true
+                        },
+                        { "data": "Address", "name": "Address", "autoWidth": true },
+                    ],
                 });
 
+
+
+            }
 
                 //$('#mapTable').DataTable({
                 //    "language": {
@@ -90,21 +91,21 @@
                 //    "searching": true,
                 //    "lengthChange": true,
                 //    "bInfo": true,
-                //    "processing": true, // for show progress bar
-                //    "serverSide": true, // for process server side
-                //    "filter": true, // this is for disable filter (search box)
-                //    "orderMulti": false, // for disable multiple column at once
-                //    "responsive": true,
-                //    "paging": true,
-                //    "bDestroy": true,
+                //    //"processing": true, // for show progress bar
+                //    ////"serverSide": true, // for process server side
+                //    //"filter": true, // this is for disable filter (search box)
+                //    //"orderMulti": false, // for disable multiple column at once
+                //    //"responsive": true,
+                //    //"paging": true,
+                //    //"bDestroy": true,
                 //    "ajax": {
-                //        "url": "/Admin/Liste/",
-                //        "data": function (data) {
-                //            data.token = localStorage.getItem("token");
-                //        },
+                //        "url": "/Admin/GetMaps/",
+                //        //"data": function (data) {
+                //        //    data.token = localStorage.getItem("token");
+                //        //},
                 //        "type": "GET",
-                //        "datatype": "json",
-                //        "dataSrc": ""
+                //        //"datatype": "json",
+                //        //"dataSrc": ""
                 //    },
                 //    "columns": [
                 //        { "data": "Latitude", "name": "Latitude", "autoWidth": true },
@@ -143,15 +144,33 @@
                 //    contentType: "application/json",
                 //    dataType: "json"
                 //});
-            }
         });
     </script>
     <script type="text/javascript">
         $("#export").on('click', function () {
-            $.get("/Admin/Export", function (data) {
-                console.log(data);
-            });
+            Export();
         });
+
+        function Export()
+        {
+           GetRequestedDataa("/Admin/ExportToExcel/");
+           window.open("/Admin/ExportToExcel/");
+        }
+
+        function GetRequestedDataa(url) {
+            $.ajax({
+                url: url,
+                async: false,
+                type: 'GET',
+                success: function (data) {
+                    resultData = data; // here I am getting this UMS.Entities.Role
+                },
+                error: function (error) {
+                    alert(error.statusText);
+                }
+            });
+
+        }
     </script>
 }
 

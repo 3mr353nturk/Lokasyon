@@ -11,6 +11,7 @@
 
     //var myData = ser.Serialize(ViewBag.onceki);
     var data = ViewBag.onceki;
+    var User = ViewBag.User;
 }
 
 <style type="text/css">
@@ -94,23 +95,22 @@
                                 <label class="custom-file-label" for="FileUpload"></label>
                             </div>
                         </div>
+                        <input type="hidden" id="lat" name="lat" value="" />
+                        <input type="hidden" id="lng" name="lng" value="" />
                         <input type="hidden" id="items" name="items" value="" />
                         <button type="submit" id="Submit" class="btn btn-primary"><i class="fa fa-upload" aria-hidden="true"></i> Yükle</button>
                         <button type="button" id="export" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel'e Aktar</button>
                         <button type="button" id="exportt" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel Şablonu İndir</button>
                         <br /><br />
                         <ul id="ulList"></ul>
+
                     }
 
                     <div class="form-group">
                         <label>Son yüklenen excel dosyası:</label>
 
                         <input id="txtBox" type="text" class="form-control" name="FileUploadd" />
-                        <input type="hidden" id="onceki" value="@ViewBag.onceki" />
-                        <input type="hidden" id="oncekii" value="@ViewBag.oncekii" />
-                        <input type="hidden" id="lati" value="@ViewBag.lat" />
-                        <input type="hidden" id="longi" value="@ViewBag.lng" />
-                        <input type="hidden" id="adres" value="@ViewBag.address" />
+                        <input type="hidden" id="onceki" value="" />
                     </div>
                     <button type="button" id="Submitt" class="btn btn-primary"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel'e Aktar</button>
                 </div>
@@ -166,7 +166,8 @@
     //get location form
 
         var locationForm = document.getElementById('location-form');
-
+        var lat;
+        var lng;
     //listen for submitform
     //locationForm.on('submit', geocode);
 
@@ -187,6 +188,7 @@
         });
 
         var html = "";
+        //showMap();
         function showMap() {
 
 
@@ -205,7 +207,7 @@
                 "paging": true,
                 "bDestroy": true,
                 "ajax": {
-                    "url": "/Admin/GetMaps/",
+                    "url": "/Admin/GetMapss/",
                     "type": "GET",
                     "datatype": "json",
                     "dataSrc": ""
@@ -316,19 +318,16 @@
                                         $("#export").prop("disabled", false);
                                         $("#Submit").html("Yükle");
                                         $("#ulList").empty();
-                                        var lastFile =$("#onceki").val();
-                                        console.log(lastFile);
-                                        var prevFile = $("#oncekii").val();
-                                        console.log(prevFile);
-                                        $.cookie('oncekiYuklenenDosya', lastFile, { expires: 365 });
-                                        $.cookie('dahaOncekiYuklenenDosya', prevFile, { expires: 365 });
+                                        //var lastFile =$("#onceki").val();
+                                        //var prevFile = $("#oncekii").val();
+                                        //$.cookie('oncekiYuklenenDosya', lastFile, { expires: 365 });
+                                        //$.cookie('dahaOncekiYuklenenDosya', prevFile, { expires: 365 });
 
-                                        @*//$.get de olabilir ya da api url verilip o şekilde de denenebilir.
-                                        $.ajax({
+                                        //$.get de olabilir ya da api url verilip o şekilde de denenebilir.
+                                        @*$.ajax({
                                             type: "GET",
                                             url: '@Url.Action("AddMap","Admin")',
                                             success: function (data) {
-                                                console.log(data);
                                             },
                                             error: function (error) {
                                                 alert(error);
@@ -357,7 +356,6 @@
                                         //            data: data,
                                         //            success: function (result) {
                                         //                if (result == ok) {
-                                        //                    console.log(result);
                                         //                }
                                         //            }
                                         //        });
@@ -368,14 +366,11 @@
                                         //});
                                         //getLatLng(d[i + 1].Adres, function (lat, lng) {
                                         //    if (lat != '' && lng != '') {
-                                        //        console.log(lat);
-                                        //        console.log(lng);
                                         //        document.getElementById('lat').value = lat;
                                         //        document.getElementById('lng').value = lng;
                                         //        //$('#myForm').submit(function (event) {
                                         //        //    event.preventDefault();
                                         //        //    var form = $(this);
-                                        //        //    console.log(form.serialize());
                                         //        //    $.ajax({
                                         //        //        type: form.attr('method'),
                                         //        //        url: form.attr('action'),
@@ -384,7 +379,105 @@
                                         //        //});
                                         //    }
                                         //});
-                                        showMap();
+                                        var fu1 = document.getElementById("FileUpload");
+                                        var filename = fu1.files[0].name;
+                                        @*var userr = '@ViewBag.User';*@
+                                        handleFileSelect(fu1);
+                                        //$.cookie('sonYuklenenDosya', filename, { expires: 365 });
+                                        //$.cookie('userId', userr, { expires: 365 });
+                                        //SonEklenenDosya();
+                                        var html;
+                                        $.ajax({
+                                            url: "/Admin/GetMapss/",
+                                            type: "GET",
+  
+                                            success: function (data) {
+                                                $.each(data, function (i, item) {
+                                                    //console.log(item.Latitude);
+
+                                                    html += '<tr>' +
+                                                        '<td>' + item.Latitude + '</td>' +
+                                                        '<td>' + item.Longitude + '</td>' +
+                                                        '<td>' + item.Address + '</td>' +
+                                                        '</tr>';
+                                                });
+                                                $("#tblIcerik").empty().append(html);
+                                                $('#mapTable').DataTable({
+                                                    "language": {
+                                                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                                                    },
+                                                    "searching": false,
+                                                    "bInfo":false
+                                                });
+                                                //$('#mapTable').DataTable().destroy();
+                                                //var table = $("#mapTable").DataTable();
+                                                //table.ajax.reload();
+                                                //if ($.fn.dataTable.isDataTable('#mapTable')) {
+                                                //    //$('#mapTable').empty();
+                                                //    $('#mapTable').DataTable();                  
+                                                //}
+                                                //    $("#mapTable").DataTable({
+                                                //        "language": {
+                                                //            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                                                //        },
+                                                //        "searching": false,
+                                                //        "paging": false,
+                                                //        "bInfo": false
+                                                //    });
+                                                //$("#mapTable").DataTable({
+                                                //    "language": {
+                                                //        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                                                //    },
+                                                //    "searching": false,
+                                                //    "paging": false,
+                                                //    "bInfo":false
+                                                //});
+                                            },
+                                            error: function (error) {
+                                                console.log(error);
+                                            },
+                                            contentType: "application/json",
+                                            dataType: "json"
+                                        });
+                                        //handleFileSelect(fu1);
+                                        //$('#mapTable').DataTable({
+                                        //    "language": {
+                                        //        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                                        //    },
+                                        //    "searching": true,
+                                        //    "lengthChange": true,
+                                        //    "bInfo": true,
+                                        //    "processing": true, // for show progress bar
+                                        //    //"serverSide": true, // for process server side
+                                        //    "filter": true, // this is for disable filter (search box)
+                                        //    "orderMulti": false, // for disable multiple column at once
+                                        //    "responsive": true,
+                                        //    "paging": true,
+                                        //    "bDestroy": true,
+                                        //    "ajax": {
+                                        //        "url": "/Admin/GetMapss/",
+                                        //        "type": "GET",
+                                        //        "datatype": "json",
+                                        //        "dataSrc": ""
+                                        //    },
+                                        //    "columns": [
+                                        //        {
+                                        //            "data": "Latitude", "name": "Latitude", "autoWidth": true
+                                        //        },
+                                        //        {
+                                        //            "data": "Longitude", "name": "Longitude", "autoWidth": true
+                                        //        },
+                                        //        { "data": "Address", "name": "Address", "autoWidth": true },
+                                        //    ],
+                                        //});
+                                        //var fu1 = document.getElementById("FileUpload");
+                                        //var filename = fu1.files[0].name;
+                                        var userr = '@ViewBag.User';
+                                        $.cookie('sonYuklenenDosya', filename, { expires: 365 });
+                                        $.cookie('userId', userr, { expires: 365 });
+                                        SonEklenenDosya();
+                                        var dosyaYolu = $.cookie('sonYuklenenDosya');
+                                        $("#txtBox").val(dosyaYolu);
                                     } else {
                                         width++;
                                         elem.style.width = width + "%";
@@ -397,6 +490,7 @@
                 },
                 complete: function (xhr) {
                     if (xhr.success == true) {
+
 
                         swal({
                             title: "Başarılı!",
@@ -414,37 +508,71 @@
 
             });
 
-        //dosya seçiliyor. 
+            //dosya seçiliyor.
         $('input[type="file"]').change(function (e) {
-            handleFileSelect(e);
             var fileName = e.target.files[0].name;
-            $.removeCookie('sonYuklenenDosya');
-            $.cookie('sonYuklenenDosya', e.target.files[0].name, { expires: 365 });
-            var lastFile =$("#onceki").val();
-            console.log(lastFile);
-            var prevFile = $("#oncekii").val();
-            console.log(prevFile);
-            $.cookie('oncekiYuklenenDosya', lastFile, { expires: 365 });
-            $.cookie('dahaOncekiYuklenenDosya', prevFile, { expires: 365 });
-            var dosyaYolu = $.cookie('sonYuklenenDosya');
-            $("#txtBox").val(dosyaYolu);
+            var user = '@ViewBag.User';
+                $.ajax({
+
+                   type: "GET",
+
+                   url: "/Admin/GetMapss",
+
+                   dataType: "json",
+
+                   success: function (msg) {
+
+                       var user = '@ViewBag.User';
+                       var elem;
+                       for (var i = 0; i < msg.length; i++) {
+                           elem = msg[i];
+                           if (user == elem.UserID && fileName == elem.FileName) {
+                               //alert('Aynı isimde dosya daha önceden kaydedilmiş...');
+                               $("#Submit").prop("disabled", true);
+                               setTimeout(function () { $("#Submit").prop("disabled", false); }, 5000);
+                           }
+                       }
+                   }
+                });
+            if (user == $.cookie('userId') && fileName == $.cookie('sonYuklenenDosya')) {
+                alert('Aynı isimde dosya daha önceden kaydedilmiş...');
+                $("#Submit").prop("disabled", true);
+                setTimeout(function () { $("#Submit").prop("disabled", false); }, 5000);
+            }
+            else {
+                //$.removeCookie('sonYuklenenDosya');
+                //handleFileSelect(e);
+                //var fileName = e.target.files[0].name;
+                //$.removeCookie('sonYuklenenDosya');
+                //$.cookie('sonYuklenenDosya', e.target.files[0].name, { expires: 365 });
+                //var lastFile =$("#onceki").val();
+                //var prevFile = $("#oncekii").val();
+                //$.cookie('oncekiYuklenenDosya', lastFile, { expires: 365 });
+                //$.cookie('dahaOncekiYuklenenDosya', prevFile, { expires: 365 });
+            }
         });
+
 
 
         //seçilen excel dosyası json'a dönüştürülüyor.
 
-        function handleFileSelect(evt) {
+        function handleFileSelect(fileUpload) {
 
-            var files = evt.target.files; // FileList object
+            var files = fileUpload.files; // FileList object
+            var fileName = fileUpload.files[0].name;
             var xl2json = new ExcelToJSON();
-            xl2json.parseExcel(files[0]);
+            xl2json.parseExcel(files[0], fileName);
         }
 
+
+        //var d;
+        //var len;
+        //var fileName;
         //exceldeki adreslerin lokasyonunu bulan yer
 
         var ExcelToJSON = function () {
 
-            this.parseExcel = function (file) {
+            this.parseExcel = function (file, fName) {
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
@@ -457,64 +585,82 @@
                         // Here is your object
                         var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
                         var json_object = JSON.stringify(XL_row_object);
-                        console.log(json_object);
                         var d = JSON.parse(json_object);
-                        console.log(d);
 
-                        for (var i = 0; i <= d.length; i++) {
+                        var len = Object.keys(d).length;
+                        var fileName = fName;
 
-                            $.each(d[i + 1], function (IndexNo, Deger) {
-                                console.log(Deger);
+                        //$.each(d, function (i) {
+                        //    getLatLng(d[i].Adres, fileName, len);
+                        //});
 
-                                //json olarak gelen adresler fonksiyona gönderiliyor. adreslerin enlem ve boylamları bulunuyor.
-                                getLatLng(d[i + 1].Adres, function (lat, lng) {
-                                    if (lat != '' && lng != '') {
-                                        console.log(lat);
-                                        console.log(lng);
+                        $.ajax({
 
-                                        document.getElementById('lat').value = lat;
-                                        document.getElementById('lng').value = lng;
+                            type: "GET",
+
+                            url: "/Admin/GetMapss",
+
+                            dataType: "json",
+
+                            success: function (msg) {
+
+                                //if (msg !== 0) {
+                                //$.each(d, function (i) {
+                                //    getLatLng(d[i].Adres, fileName, len);
+                                //});
+                                //}
+
+
+                                //if (!$.trim(msg)) {
+                                //    $.each(d, function (i) {
+                                //        getLatLng(d[i].Adres, fileName, len);
+                                //    });
+                                //}
+
+
+
+                                @*var user = '@ViewBag.User';
+                                function Uyari() {
+                                    var elem;
+                                    for (var i = 0; i < msg.length; i++) {
+                                        elem = msg[i];
+                                        if (user == elem.UserID && fileName == elem.FileName) {
+                                            alert('Aynı isimde dosya daha önceden kaydedilmiş...');
+                                            $("#Submit").prop("disabled", true);
+                                        }
                                     }
 
-                                    var maps = [
-                                        { lat: lat },
-                                        { lng: lng }
-                                    ];
+                                }
 
-                                    maps = JSON.stringify({ 'maps': maps });
+                                setTimeout(Uyari, 1000);*@
 
-                                    console.log(maps);
 
-                                    var maplist = new Array();
 
-                                    maplist[0] = lat;
-                                    maplist[1] = lng;
 
-                                    var maplst = new Array();
 
-                                    $.each(maplist, function () {
-                                        var map = {};
-                                        map.Latitude = maplist[0];
-                                        map.Longitude = maplist[1];
-                                        maplst.push(map);
-                                        console.log(map);
-                                        //document.getElementById('items').value = map;
-                                    });
+                                    //else {
+                                    //    $.each(d, function (i) {
+                                    //        getLatLng(d[i].Adres, fileName, len);
+                                    //    });
+                                    //}
 
-                                    //document.getElementById('items').value = map;
 
-                                });
+                                    for (var i = 0; i < len; i++) {
+                                        getLatLng(d[i].Adres, fileName, len);
+                                    }
 
-                            });
-
-                        }
+                            }
+                        });
 
                     })
+
+                    //for (var i = 0; i < len; i++) {
+                    //    getLatLng(d[i].Adres, fileName, len);
+                    //}
 
                 };
 
                 reader.onerror = function (ex) {
-                    console.log(ex);
                 };
 
                 reader.readAsBinaryString(file);
@@ -522,20 +668,109 @@
         };
 
 
-        //gelen adres datalarına göre enlem ve boylamlar bulunuyor.
-        function getLatLng(address, fn) {
+        ////gelen adres datalarına göre enlem ve boylamlar bulunuyor.
+        //for (var i = 0; i < len; i++) {
+        //    getLatLng(d[i].Adres, fileName, len);
+        //}
+        function getLatLng(address, fileName, fileCount) {
             axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
                 params: {
                     address: address,
                     key: 'AIzaSyA1XKIDyLIR82RZSXzizzqmmU8BKE-NhVo'
                 }
             }).then(function (response) {
-                fn(response.data.results[0].geometry.location.lat, response.data.results[0].geometry.location.lng);
-            })
-        }
+                //geometry
+                var lat = response.data.results[0].geometry.location.lat;
+                var lng = response.data.results[0].geometry.location.lng;
+                var array = [];
+                var map = {
+                    Latitude: lat,
+                    Longitude: lng,
+                    Address: address,
+                    FileName: fileName,
+                    FileCount: fileCount
+                }
+                //$.each(map, function (index, valueObj) {
+                //    var compId = valueObj.companyid;
+                //    var isSaved = valueObj.saved;
+                //});
+                array.push(map);
+                //var newArray = JSON.stringify(array);
+                //var Array = $.parseJSON(newArray);
+                //'{"name":"selami","number":"3"}'
+                $.ajax({
+                    type: 'POST',
+                    url: '/Admin/Save',
+                    //{ "MapList": array, "fileName": fileName, "len": fileCount },
+                    data: {
+                        MapList: array,
+                        fileName: fileName,
+                        len: fileCount
+                        //param:'test string'
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        //showMap();
+                        if (response != null) {
+
+                            //$('#mapTable').DataTable({
+                            //    "language": {
+                            //        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                            //    },
+                            //    "searching": true,
+                            //    "lengthChange": true,
+                            //    "bInfo": true,
+                            //    "processing": true, // for show progress bar
+                            //    //"serverSide": true, // for process server side
+                            //    "filter": true, // this is for disable filter (search box)
+                            //    "orderMulti": false, // for disable multiple column at once
+                            //    "responsive": true,
+                            //    "paging": true,
+                            //    "bDestroy": true,
+                            //    "ajax": {
+                            //        "url": "/Admin/GetMapss/",
+                            //        "type": "GET",
+                            //        "datatype": "json",
+                            //        "dataSrc": ""
+                            //    },
+                            //    "columns": [
+                            //        {
+                            //            "data": "Latitude", "name": "Latitude", "autoWidth": true
+                            //        },
+                            //        {
+                            //            "data": "Longitude", "name": "Longitude", "autoWidth": true
+                            //        },
+                            //        { "data": "Address", "name": "Address", "autoWidth": true },
+                            //    ],
+                            //});
 
 
-       
+                            //showMap();
+                            //for (var i = 0; i < response.length; i++) {
+                            //}
+                            //alert("Record added successfully.");
+                        }
+                    },
+                    error: function (error) {
+                        @*var data = '@TempData["message"]';
+                        alert(data);*@
+                                //var myVar;
+                                //myVar = setTimeout(function () { $("#Submit").prop("disabled", true); }, 2000);
+                                //clearTimeout(myVar);
+                                //var jsonValue = $.parseJSON(error.responseText);
+                                //alert("Error : " + jsonValue);
+
+                            }
+                    })
+
+                    //showMap();
+
+                    })
+                }
+
+
+
+
 
 
 
@@ -557,26 +792,18 @@
                                    //     url: '/Admin/Index/',
                                    //     data: postData,
                                    //     success: function(data){
-                                   //         //console.log(data.Result);
                                    //     },
                                    //     traditional: true
                                    // });
-
-                                   // //console.log(postData);
-
-                                   // //console.log(maplist);
 
                                    // var list = new Array();
                                    // $.each(maplist,function (index, deger) {
                                    //     list[index] = deger;
                                    // });
-                                   // //console.log(list);
 
                                    // var arr = maplist;
 
                                    // arr.forEach(function (elem, index) {
-
-                                   //     console.log(`${index} . ${elem}`);
                                    // });
 
                                     //for (var i = 0; i < maps.length; i++) {
@@ -592,11 +819,9 @@
 
 
 
-                                //console.log(lat);
-                                //console.log(lng);
                                 //document.getElementById('lat').value = lat;
                                 //document.getElementById('lng').value = lng;
-                 
+
 
 
 
@@ -607,8 +832,6 @@
                         //    //geocode2();
                         //    getLatLng(d[i + 1].Adres, function (lat, lng) {
                         //        if (lat != '' && lng != '') {
-                        //            console.log(lat);
-                        //            console.log(lng);
 
 
                         //            //document.getElementById('lat').value = lat;
@@ -618,10 +841,6 @@
 
                         //            //    $.each(d[j],
                         //            //        function (IndexNo, Deger) {
-
-                        //            //            console.log(Deger);
-                        //            //            //console.log(lat);
-                        //            //            //console.log(lng);
                         //            //            //document.getElementById('lat').value = lat;
                         //            //            //document.getElementById('lng').value = lng;
                         //            //        }
@@ -634,7 +853,6 @@
                         //            //$('#Myform').submit(function (event) {
                         //            //    event.preventDefault();
                         //            //    var form = $(this);
-                        //            //    //console.log(form.serialize());
                         //            //    $.ajax({
                         //            //        type: form.attr('method'),
                         //            //        url: form.attr('action'),
@@ -646,9 +864,9 @@
                         //}
 
 
-     
 
-        
+
+
 
     $("#export").on('click', function () {
         Export();
@@ -664,7 +882,8 @@
 
     function Export()
     {
-        var filename = $('input[type=file]').val().split('\\').pop();
+        //var filename = $('input[type=file]').val().split('\\').pop();
+        var filename = $.cookie('sonYuklenenDosya');
         GetRequestedData("/Admin/SonExport/?fileName=" + filename);
         window.open("/Admin/SonExport/?fileName=" + filename);
     }
@@ -702,7 +921,6 @@
         })
             .then(function (response) {
                 //log full response
-                console.log(response);
 
                 //formatted address
                 var formattedAddress = response.data.results[0].formatted_address;
@@ -740,7 +958,6 @@
 
             })
             .catch(function (error) {
-                console.log(error);
                 swal({
                     title: "Hata!",
                     text: "Hata Oluştu!",
@@ -764,7 +981,6 @@
             })
                 .then(function (response) {
                     //log full response
-                    console.log(response);
 
                     //formatted address
                     var formattedAddress = response.data.results[0].formatted_address;
@@ -802,7 +1018,6 @@
 
                 })
                 .catch(function (error) {
-                    console.log(error);
                     swal({
                         title: "Hata!",
                         text: "Hata Oluştu!",

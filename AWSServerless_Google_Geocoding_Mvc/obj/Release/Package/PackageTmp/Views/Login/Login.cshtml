@@ -98,14 +98,12 @@
                 url: url,
                 data: JSON.stringify(user),
                 success: function (data) {
-                    console.table(data);
                     localStorage.setItem("token", data.token);
                     ////sessionStorage.setItem("UserID", $("#UserID").val());
                     //sessionStorage.setItem("Username", $("#Username").val());
                     //window.location.href = newUrl;
                 },
                 error: function (data) {
-                    console.log(data);
                     //window.location.href = oldUrl;
                 },
                 contentType: "application/json",

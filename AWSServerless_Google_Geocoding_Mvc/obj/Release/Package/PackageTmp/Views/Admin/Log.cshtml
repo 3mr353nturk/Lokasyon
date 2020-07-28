@@ -33,11 +33,12 @@
                             @*<th><i class="icon_profile"></i> ID</th>*@
                             <th><i class="fa fa-file" aria-hidden="true"></i> Dosya Adı</th>
                             @*<th><i class="fa fa-file" aria-hidden="true"></i> Önceki Dosya Adı</th>
-                                <th><i class="fa fa-file" aria-hidden="true"></i> Daha Önceki Dosya Adı</th>*@
+        <th><i class="fa fa-file" aria-hidden="true"></i> Daha Önceki Dosya Adı</th>*@
                             <th><i class="fa fa-calendar" aria-hidden="true"></i> Yüklenme Tarihi</th>
                             <th><i class="fa fa-calculator" aria-hidden="true"></i> Kayıt Sayısı</th>
                             <th><i class="fa fa-user" aria-hidden="true"></i> Yükleyen Kişi</th>
-                            <th><i class="fa fa-user" aria-hidden="true"></i> Detayı Gör</th>
+                            <th><i class="fa fa-user" aria-hidden="true"></i> Detay Alanı</th>
+                            <th><i class="fa fa-eye" aria-hidden="true"></i> Detayı Gör</th>
                         </tr>
                     </thead>
                     <tbody id="tblIcerikk">
@@ -89,34 +90,150 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('#mapTable').wrap('<div id="hide" style="display:none"/>');
-            showMap();
-            var html = "";
-            //var lastFileName = "";
-            function showMap() {
-                var url = "https://cp7u0uz8r9.execute-api.eu-west-2.amazonaws.com/Prod/api/address/getmaplist";
-                var accesstoken = localStorage.getItem("token");
 
-                //console.log(accesstoken);
+            //showMap();
+            fileMapList();
+
+            var html = "";
+            //var param = $("#btnShow").attr("data-id");
+            ////var lastFileName = "";
+            //function showMap() {
+
+            //    $('#mapTable').DataTable({
+            //        "language": {
+            //            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+            //        },
+            //        "searching": true,
+            //        "lengthChange": true,
+            //        "bInfo": true,
+            //        "processing": true, // for show progress bar
+            //        //"serverSide": true, // for process server side
+            //        "filter": true, // this is for disable filter (search box)
+            //        "orderMulti": false, // for disable multiple column at once
+            //        "responsive": true,
+            //        "paging": true,
+            //        "bDestroy": true,
+            //        "ajax": {
+            //            "url": "/Admin/GetMapss/",
+            //            "type": "GET",
+            //            "datatype": "json",
+            //            "dataSrc": ""
+            //        },
+            //        "columns": [
+            //            {
+            //                "data": "Latitude", "name": "Latitude", "autoWidth": true
+            //            },
+            //            {
+            //                "data": "Longitude", "name": "Longitude", "autoWidth": true
+            //            },
+            //            { "data": "Address", "name": "Address", "autoWidth": true },
+            //            { "data": "FileName", "name": "FileName", "autoWidth": true },
+            //            { "data": "CreateHost", "name": "CreateHost", "autoWidth": true },
+            //            { "data": "CreateDate", "name": "CreateDate", "autoWidth": true },
+            //        ],
+            //    });
+
+
+
+            //}
+
+
+                //GetRequestedData("/Admin/GetMaps");
+
+                //function GetRequestedData(url) {
+                //    //$.ajax({
+                //    //    url: url,
+                //    //    async: false,
+                //    //    type: 'GET',
+                //    //    success: function (data) {
+                //    //        resultData = data; // here I am getting this UMS.Entities.Role
+                //    //    },
+                //    //    error: function (error) {
+                //    //        $(this).remove();
+                //    //        alert(error.statusText);
+                //    //    }
+                //    //});
+                //    $.ajax({
+                //        url: url,
+                //        type: "GET",
+                //        async: false,
+                //        dataType: "json",
+                //        //crossDomain: true,
+                //        //headers: {
+                //        //    Authorization: "Bearer " + accesstoken,
+                //        //    'Access-Control-Allow-Origin': '*'
+                //        //},
+                //        success: function (data) {
+                //            $.each(data, function (i, item) {
+                //                //var d = new Date(item.CreateDate);
+                //                //var n = d.toLocaleString();
+                //                function ConvertTicksToDate(vl) {
+                //                    vl = vl.replace("Date", "");
+                //                    vl = vl.replace("/", "");
+                //                    vl = vl.replace("(", "");
+                //                    vl = vl.replace(")", "");
+                //                    vl = vl.replace("/", "").trim();
+
+                //                    var vlDate = new Date(parseInt(vl));
+                //                    return vlDate.toLocaleDateString();
+                //                }
+                //                html += '<tr>' +
+                //                    '<td>' + item.Latitude + '</td>' +
+                //                    '<td>' + item.Longitude + '</td>' +
+                //                    '<td>' + item.Address + '</td>' +
+                //                    '<td>' + item.LastFileName + '</td>' +
+                //                    '<td>' + item.CreateHost + '</td>' +
+                //                    '<td>' + ConvertTicksToDate(item.CreateDate) + '</td>' +
+                //                    '</tr>';
+                //            });
+                //            $("#tblIcerik").append(html);
+                //            $("#mapTable").DataTable({
+                //                "language": {
+                //                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                //                }
+                //            });
+                //        },
+                //        error: function (error) {
+                //        },
+                //    });
+
+                //}
+
+
+
+
+                @*var url = '@Url.Action("GetMaps","Admin")';
+                //var accesstoken = localStorage.getItem("token");
+
                 $.ajax({
                     url: url,
                     type: "GET",
-                    crossDomain: true,
-                    headers: {
-                        Authorization: "Bearer " + accesstoken,
-                        'Access-Control-Allow-Origin': '*'
-                    },
+                    //crossDomain: true,
+                    //headers: {
+                    //    Authorization: "Bearer " + accesstoken,
+                    //    'Access-Control-Allow-Origin': '*'
+                    //},
                     success: function (data) {
                         $.each(data, function (i, item) {
-                            console.log(item);
-                            var d = new Date(item.createDate);
-                            var n = d.toLocaleDateString();
+                            //var d = new Date(item.CreateDate);
+                            //var n = d.toLocaleString();
+                            function ConvertTicksToDate(vl) {
+                                vl = vl.replace("Date", "");
+                                vl = vl.replace("/", "");
+                                vl = vl.replace("(", "");
+                                vl = vl.replace(")", "");
+                                vl = vl.replace("/", "").trim();
+
+                                var vlDate = new Date(parseInt(vl));
+                                return vlDate.toLocaleDateString();
+                            }
                             html += '<tr>' +
-                                '<td>' + item.latitude + '</td>' +
-                                '<td>' + item.longitude + '</td>' +
-                                '<td>' + item.address + '</td>' +
-                                '<td>' + item.lastFileName + '</td>' +
-                                '<td>' + item.createHost + '</td>' +
-                                '<td>' + n + '</td>' +
+                                '<td>' + item.Latitude + '</td>' +
+                                '<td>' + item.Longitude + '</td>' +
+                                '<td>' + item.Address + '</td>' +
+                                '<td>' + item.LastFileName + '</td>' +
+                                '<td>' + item.CreateHost + '</td>' +
+                                '<td>' + ConvertTicksToDate(item.CreateDate) + '</td>' +
                                 '</tr>';
                         });
                         $("#tblIcerik").append(html);
@@ -127,141 +244,247 @@
                         });
                     },
                     error: function (error) {
-                        console.log(error);
                     },
                     contentType: "application/json",
                     dataType: "json"
-                });
+                });*@
+
+
+        });
+
+        function Kontrol() {
+            var startDate = new Date($('#ilk').val());
+            var endDate = new Date($('#son').val());
+
+            if (startDate > endDate) {
+                // Do something
+                alert("başlangıç tarihi bitiş tarihinden büyük olamaz");
             }
+        }
+
+
+        function fileMapList() {
+            //$("#hide").toggle();
+            var table;
+            table = $('#mapTablee').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                },
+                "bInfo": false,
+                //"processing": true, // for show progress bar
+                //"serverSide": true, // for process server side
+                "ajax": {
+                    "url": "/Admin/FileList/",
+                    "data": function (data) {
+                        data.basTarih = $("#ilk").val();
+                        data.bitTarih = $("#son").val();
+                    },
+                    "type": "GET",
+                    "datatype": "json",
+                    "dataSrc": ""
+                },
+                "columns": [
+                    {
+                        "data": "FileName", "name": "FileName", "autoWidth": true,
+                        "render": function (data, type, row, meta) {
+                            var fileName = row.FileName;
+                            if (type === 'display') {
+                                data = '<a href="#" onClick="Export(\'' + row.FileName + '\')">' + data + '</a>';
+                            }
+
+                            return data;
+                        }
+                    },
+                    {
+                       "data": "CreateDate", "name": "CreateDate", "autoWidth": true,
+                       "render": function (value) {
+                           if (value === null) return "";
+
+                           var pattern = /Date\(([^)]+)\)/;
+                           var results = pattern.exec(value);
+                           var dt = new Date(parseFloat(results[1]));
+
+                           return (dt.getDate()) + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear();
+                       }
+                    },
+                    { "data": "FileCount", "name": "FileCount", "autoWidth": true },
+                    { "data": "CreateHost", "name": "CreateHost", "autoWidth": true },
+                    {
+                        "data": null,
+                        "defaultContent": '<button id="btnHide" class="btn btn-primary">Detay Alanını Aç/Kapat</button>'
+                    },
+                    {
+                        "data": null,
+                        "defaultContent": '<button id="btnShow" class="btn btn-primary">Detayı Gör</button>'
+                    },                  
+                ],
+                "columnDefs":
+                    [
+                        {
+                            "targets": 0,
+                            "visible": true
+                        },
+                        {
+                            "targets": 1,
+                            "visible": true
+                        },
+                        {
+                            "targets": 2,
+                            "visible": true
+                        },
+                        {
+                            "targets": 3,
+                            "visible": true
+                        },
+                        {
+                            "data": null,
+                            "defaultContent": "<button>Delete</button>",
+                            "targets": -1
+                        },
+                        {
+                            "data": null,
+                            "defaultContent": "<button>Delete</button>",
+                            "targets": -2
+                        }
+                    ]
+//                "columns": [
+//                    {
+//                        "data": "FileName", "name": "FileName", "autoWidth": true,
+//                        "render": function (data, type, row, meta) {
+//                            var fileName = row.FileName;
+//                            if (type === 'display') {
+//                                data = '<a href="#" onClick="Export(' + row.FileName + ')">' + data + '</a>';
+//                            }
+
+//                            return data;
+//                        }
+
+//                    },
+//                    {
+//                        "data": "CreateDate", "name": "CreateDate", "autoWidth": true,
+//                        "render": function (value) {
+//                            if (value === null) return "";
+
+//                            var pattern = /Date\(([^)]+)\)/;
+//                            var results = pattern.exec(value);
+//                            var dt = new Date(parseFloat(results[1]));
+
+//                            return (dt.getDate()) + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear();
+//                        }
+//                    },
+//                    { "data": "FileCount", "name": "FileCount", "autoWidth": true },
+//                    { "data": "CreateHost", "name": "CreateHost", "autoWidth": true },
+//                    {
+//                        "data": "FileName", "name": "FileName", "autoWidth": true,
+//                        "render": function (data, type, row, meta) {
+//                            for (var i = 0; i < table.page.info().length; i++) {
+//                                return '<button id="btnShow" data-id="' + row.FileName + '" class="btn btn-primary">Detayı Gör</button>';
+//                            }
+
+//                        }
+//                    }
+//                ],
+//                "defaultContent": ''
+//            },
+//                { "data": "icon" },
+//                { "data": "reporter" },
+//                { "data": "title" },
+//                { "data": "dateUploaded" },
+//                { "data": "dateReported" },
+//                { "data": "reportedReason" },
+//                { "data": "description" },
+//                { "data": "problem" },
+//                { "data": "numReports" },
+//                { "data": "deleteImage" }
+//],
+//                "columnDefs":
+//                [
+//                    {
+//                        "targets": 0,
+//                        "visible": false
+//                    },
+//                    {
+//                        "targets": 1,
+//                        "visible": false
+//                    },
+//                    {
+//                        "targets": 2,
+//                        "visible": false
+//                    },
+//                    {
+//                        "data": null,
+//                        "defaultContent": "<button>Delete</button>",
+//                        "targets": -1
+//                    }
+//                ]
+            });
 
 
             //$('#mapTable tbody').hide();
+            $.fn.dataTable.ext.errMode = 'throw';
 
-        });
+            $("#ilk").datepicker({
+                dateFormat: "dd/mm/yy",
+                onSelect: function (date) {
+                    minDateFilter = new Date(date).getTime();
+                    table.draw();
+                }
+            });
+            $("#son").datepicker({
+                dateFormat: "dd/mm/yy",
+                onSelect: function (date) {
+                    maxDateFilter = new Date(date).getTime();
+                    table.draw();
+                }
+            });
 
-        var table;
-        table = $('#mapTablee').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
-            },
-            "searching": true,
-            "lengthChange": true,
-            "bInfo": false,
-            "processing": true, // for show progress bar
-            "serverSide": true, // for process server side
-            "filter": true, // this is for disable filter (search box)
-            "orderMulti": false, // for disable multiple column at once
-            "responsive": true,
-            "paging": true,
-            "bDestroy": true,
-            "ajax": {
-                "url": "/Admin/FileList/",
-                "data": function (data) {
-                    data.basTarih = $("#ilk").val();
-                    data.bitTarih = $("#son").val();
-                    data.token = localStorage.getItem("token");
-                },
-                "type": "GET",
-                "datatype": "json",
-                "dataSrc": ""
-            },
-            "columns": [
-                {
-                    "data": "LastFileName", "name": "LastFileName", "autoWidth": true,
-                    "render": function (data, type, row, meta) {
-                        if (type === 'display') {
-                            data = '<a href="#" onClick="Export(\'' + row.LastFileName + '\')">' + data + '</a>';
+            $('#ilk, #son').on('change', function () {
+                if ($('#ilk').val() != '' && $('#son').val() != '') {
+                    $.fn.dataTable.ext.search.push(
+                        function (settings, data, dataIndex) {
+                            var from = $('#ilk').val();
+                            var to = $('#son').val();
+                            var column = data[6];
+                            if (from <= column && column <= to) {
+                                return true;
+                            }
+                            return false;
                         }
-
-                        return data;
-                    }
-
-                },
-                {
-                    "data": "CreateDate", "name": "CreateDate", "autoWidth": true,
-                    "render": function (value) {
-                        if (value === null) return "";
-
-                        var pattern = /Date\(([^)]+)\)/;
-                        var results = pattern.exec(value);
-                        var dt = new Date(parseFloat(results[1]));
-
-                        return (dt.getDate()) + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear();
-                    }
-                },
-                { "data": "FileCount", "name": "FileCount", "autoWidth": true },
-                { "data": "CreateHost", "name": "CreateHost", "autoWidth": true },
-                {
-                    "data": null,
-                    "render": function (value) { return '<button id="btnShow" class="btn btn-primary">Detayı Gör</button>'; }
+                    );
+                    table.ajax.reload();
                 }
-            ],
-        });
-
-
-        $("#ilk").datepicker({
-            "onSelect": function (date) {
-                minDateFilter = new Date(date).getTime();
-                table.draw();
-            }
-        }).keyup(function () {
-            minDateFilter = new Date(this.value).getTime();
-            table.draw();
-        });
-        $("#son").datepicker({
-            "onSelect": function (date) {
-                maxDateFilter = new Date(date).getTime();
-                table.draw();
-            }
-        }).keyup(function () {
-            maxDateFilter = new Date(this.value).getTime();
-            table.draw();
-        });
-
-        $('#ilk, #son').on('change', function () {
-            if ($('#ilk').val() != '' && $('#son').val() != '') {
-                $.fn.dataTable.ext.search.push(
-                    function (settings, data, dataIndex) {
-                        var from = $('#ilk').val();
-                        var to = $('#son').val();
-                        var column = data[6];
-                        if (from <= column && column <= to) {
-                            return true;
+                else {
+                    table.ajax.reload();
+                }
+            });
+            minDateFilter = "";
+            maxDateFilter = "";
+            $.fn.dataTableExt.afnFiltering.push(
+                function (oSettings, aData, iDataIndex) {
+                    if (typeof aData._date == 'undefined') {
+                        aData._date = new Date(aData[1]).getTime();
+                    }
+                    if (minDateFilter && !isNaN(minDateFilter)) {
+                        if (aData._date < minDateFilter) {
+                            return false;
                         }
-                        return false;
                     }
-                );
-                table.ajax.reload();
-            }
-            else {
-                table.ajax.reload();
-            }
-        });
-        minDateFilter = "";
-        maxDateFilter = "";
-        $.fn.dataTableExt.afnFiltering.push(
-            function (oSettings, aData, iDataIndex) {
-                if (typeof aData._date == 'undefined') {
-                    aData._date = new Date(aData[1]).getTime();
-                }
-                if (minDateFilter && !isNaN(minDateFilter)) {
-                    if (aData._date < minDateFilter) {
-                        return false;
+                    if (maxDateFilter && !isNaN(maxDateFilter)) {
+                        if (aData._date > maxDateFilter) {
+                            return false;
+                        }
                     }
+                    return true;
                 }
-                if (maxDateFilter && !isNaN(maxDateFilter)) {
-                    if (aData._date > maxDateFilter) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        );
+            );
+
+        }
+
 
 
         var inputElement = document.createElement('a');
         inputElement.addEventListener('click', function () {
-            Export(row.LastFileName);
+            Export(row.FileName);
         });
 
         document.body.appendChild(inputElement);
@@ -301,7 +524,6 @@
         //        },
         //        type: "GET",
         //        success: function (dataa) {
-        //            console.log(dataa);
         //        }
         //    });
 
@@ -317,14 +539,10 @@
         function Export(data) {
             var val = data;
             //alert(val);
-            $.ajax({
-                url: "/Admin/SonExport/",
-                data: { lastFileName: val },
-                type: "GET",
-                success: function (dataa) {
-                    console.log(dataa);
-                }
-            });
+            @*var url = '@Url.Action("SonExport","Admin")?lastFileName='+ val;
+            window.open(url);*@
+            GetRequestedDataaa("/Admin/SonExport/?fileName="+ val);
+            window.open("/Admin/SonExport/?fileName=" + val);
 
             //var myFileUri = val;
             //alertCsvCount(myFileUri);
@@ -339,13 +557,23 @@
             //}
         }
 
-        
+        function GetRequestedDataaa(url, callback) {
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: callback,
+                error: function (error) {
+                    alert(error.statusText);
+                }
+            });
+        }
+
+
 
 
 
         //function Export() {
         //    //$.get("/Admin/SonExport", function (data) {
-        //    //    console.log(data);
         //    //});
         //    $.ajax({
         //        url: "/Admin/SonExport",
@@ -354,14 +582,12 @@
         //            data.lastFileName = lastFileName;
         //        },
         //        success: function (dataa) {
-        //            console.log(dataa);
         //        }
         //    })
         //    //$.ajax({
         //    //    url: "/Admin/SonExport",
         //    //    type: "POST",
         //    //    success: function (data) {
-        //    //        console.log(data);
         //    //        $.each(data, function (i, item) {
         //    //            var d = new Date(item.CreateDate);
         //    //            var n = d.toLocaleDateString();
@@ -373,7 +599,6 @@
         //    //                '<td>' + item.CreateHost + '</td>' +
         //    //                '</tr>';
         //    //        });
-        //    //        //console.log(tableHtml);
         //    //        $("#tblIcerikk").append(html);
         //    //        $("#mapTablee").DataTable({
         //    //            "language": {
@@ -382,7 +607,6 @@
         //    //        });
         //    //    },
         //    //    error: function (error) {
-        //    //        console.log(error);
         //    //    },
         //    //    contentType: "application/json",
         //    //    dataType: "html"
@@ -391,25 +615,139 @@
 
         //function LastExport() {
         //    $.get("/Admin/OncekiExport", function (data) {
-        //        console.log(data);
         //    });
         //}
 
         //function BeforeExport() {
         //    $.get("/Admin/DahaOncekiExport", function (data) {
-        //        console.log(data);
         //    });
         //}
 
         $("#export").on('click', function () {
-            $.get("/Admin/Export", function (data) {
-                console.log(data);
+            Exportt();
+        });
+
+        function Exportt()
+        {
+           GetRequestedDataa("/Admin/ExportToExcel/");
+           window.open("/Admin/ExportToExcel/");
+        }
+
+        function GetRequestedDataa(url) {
+            $.ajax({
+                url: url,
+                async: false,
+                type: 'GET',
+                success: function (data) {
+                    resultData = data; // here I am getting this UMS.Entities.Role
+                },
+                error: function (error) {
+                    alert(error.statusText);
+                }
             });
+
+        }
+
+        //$('#mapTablee tbody').on('click', 'tr', function () {
+        //    var table = $("#mapTablee").DataTable();
+        //    var data = table.row(this).data();
+        //    alert(data + "'s salary is: " + data);
+        //});
+
+        $(document).on('click', '#btnHide', function () {
+            $("#hide").toggle();
         });
 
         $(document).on('click', '#btnShow', function () {
             //$('#hide').css('display', 'block');
-            $("#hide").toggle();
+            var table = $('#mapTablee').DataTable();
+
+            var data = table.row($(this).parents('tr')).data();
+
+            var html;
+            $.ajax({
+                url: "/Admin/GetMaps/",
+                type: "GET",
+                data: {
+                    fileName: data.FileName
+                },
+                success: function (data) {
+                    $.each(data, function (i, item) {
+                        //console.log(item.Latitude);
+                        var pattern = /Date\(([^)]+)\)/;
+                        var results = pattern.exec(item.CreateDate);
+                        var dt = new Date(parseFloat(results[1]));
+
+                        html += '<tr>' +
+                            '<td>' + item.Latitude + '</td>' +
+                            '<td>' + item.Longitude + '</td>' +
+                            '<td>' + item.Address + '</td>' +
+                            '<td>' + item.FileName + '</td>' +
+                            '<td>' + item.CreateHost + '</td>' +
+                            '<td>' + (dt.getDate()) + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear() + '</td>' +
+                            '</tr>';
+                    });
+                    $("#tblIcerik").append(html);
+                    //$('#mapTable').DataTable().destroy();
+                    if ($.fn.dataTable.isDataTable('#mapTable')) {
+                        //$('#mapTable').empty();
+                        $('#mapTable').DataTable();                  
+                    }
+                        $("#mapTable").DataTable({
+                            "language": {
+                                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                            },
+                            "searching": false,
+                            "paging": false,
+                            "bInfo": false
+                        });
+                    //$("#mapTable").DataTable({
+                    //    "language": {
+                    //        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+                    //    },
+                    //    "searching": false,
+                    //    "paging": false,
+                    //    "bInfo":false
+                    //});
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+                contentType: "application/json",
+                dataType: "json"
+            });
+            //$('#mapTable').DataTable({
+            //    "language": {
+            //        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Turkish.json"
+            //    },
+            //    //"serverSide": true, // for process server side
+            //    "ajax": {
+            //        "url": "/Admin/GetMaps/",
+            //        "type": "GET",
+            //        "data": param,
+            //        "datatype": "json",
+            //        "dataSrc": ""
+            //    },
+            //    "columns": [
+            //        { "data": "Latitude", "name": "Latitude", "autoWidth": true },
+            //        { "data": "Longitude", "name": "Longitude", "autoWidth": true },
+            //        { "data": "Address", "name": "Address", "autoWidth": true },
+            //        { "data": "FileName", "name": "FileName", "autoWidth": true },
+            //        { "data": "CreateHost", "name": "CreateHost", "autoWidth": true },
+            //        {
+            //            "data": "CreateDate", "name": "CreateDate", "autoWidth": true,
+            //            "render": function (value) {
+            //                if (value === null) return "";
+
+            //                var pattern = /Date\(([^)]+)\)/;
+            //                var results = pattern.exec(value);
+            //                var dt = new Date(parseFloat(results[1]));
+
+            //                return (dt.getDate()) + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear();
+            //            }
+            //        },
+            //    ],
+            //});
             //var table = $('#mapTablee').DataTable();
             //var columns = table.columns(1);
             //var tablee = $('#mapTable').DataTable();
@@ -433,6 +771,8 @@
                         //    //$("#txtBoxxx").empty();
                         //    $("#txtBoxxx").html($.cookie('dahaOncekiYuklenenDosya'));
                         //}
+
+
     </script>
 }
 

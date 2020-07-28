@@ -23,10 +23,12 @@ using System.Web.UI;
 using System.Data;
 using ClosedXML.Excel;
 using System.Data.SqlClient;
+using System.Net;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace AWSServerless_Google_Geocoding_Mvc.Controllers
 {
-    //[ControlLogin]
+    [ControlLogin]
     public class AdminController : Controller
     {
         // GET: Admin
@@ -34,20 +36,20 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
         public ActionResult Index()
         {
             ViewBag.Name = Session["FirstName"];
-            var oncekii = _dbContext.Map.OrderByDescending(o => o.FileName).Take(1).Select(o => o.FileName).FirstOrDefault();
-            ViewBag.onceki = oncekii;
-            var onceki = _dbContext.Map.OrderBy(o => o.FileName).Take(1).Select(o => o.FileName).FirstOrDefault();
-            ViewBag.oncekii = onceki;
-            var lat = _dbContext.Map.OrderBy(o => o.FileName).Take(1).Select(o => o.Latitude).FirstOrDefault();
-            ViewBag.lat = lat;
-            var lng = _dbContext.Map.OrderBy(o => o.FileName).Take(1).Select(o => o.Longitude).FirstOrDefault();
-            ViewBag.lng = lng;
+            //var oncekii = _dbContext.Map.OrderByDescending(o => o.FileName).Take(1).Select(o => o.FileName).FirstOrDefault();
+            //ViewBag.onceki = oncekii;
+            //var onceki = _dbContext.Map.OrderBy(o => o.FileName).Take(1).Select(o => o.FileName).FirstOrDefault();
+            //ViewBag.oncekii = onceki;
+            //var lat = _dbContext.Map.OrderBy(o => o.FileName).Take(1).Select(o => o.Latitude).FirstOrDefault();
+            //ViewBag.lat = lat;
+            //var lng = _dbContext.Map.OrderBy(o => o.FileName).Take(1).Select(o => o.Longitude).FirstOrDefault();
+            //ViewBag.lng = lng;
             //var address = _dbContext.Map.OrderByDescending(o => o.FileName).Select(o => o.Address).ToList();
             //ViewBag.address = address;
             int uid = Convert.ToInt32(Session["UserID"]);
             var user = _dbContext.User.Where(x => x.UserId == uid).FirstOrDefault();
-            ViewBag.User = user.UserId;
-            
+            ViewBag.User = uid;
+
             //ViewBag.LastFileName = Request.Cookies["sonYuklenenDosya"].Value;
             //ViewBag.PrevFileName = Request.Cookies["oncekiYuklenenDosya"].Value;
             //ViewBag.BeforeFileName = Request.Cookies["dahaOncekiYuklenenDosya"].Value;
@@ -55,14 +57,8 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
             return View(maps);
         }
 
-        public ActionResult Index2()
-        {
-            return View();
-        }
-
-
         [HttpPost]
-        public ActionResult Index(FormCollection formCollection, string lat, string lng)
+        public ActionResult Index(FormCollection formCollection)
         {
             LocationDBEntities db = new LocationDBEntities();
             List<Map> mapList = new List<Map>();
@@ -71,62 +67,50 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
                 HttpPostedFileBase file = Request.Files["FileUpload"];
                 if ((file != null) && (file.ContentLength > 0) && !string.IsNullOrEmpty(file.FileName))
                 {
-                    string fileName = file.FileName;
+                    string fileNamee = file.FileName;
                     string fileContentType = file.ContentType;
                     byte[] fileBytes = new byte[file.ContentLength];
                     var path = Path.Combine(Server.MapPath("~/Content/FileUpload"), file.FileName);
                     file.SaveAs(path);
-                    var data = file.InputStream.Read(fileBytes, 0, Convert.ToInt32(file.ContentLength));
-                    if (db.Map.Where(x => x.FileName == fileName).Any())
-                    {
-                        TempData["Message"] = "Aynı isimden dosya mevcut.";
-                        ViewBag.Path = path;
-                        return View();
-                    }
-                    else
-                    {
-                        using (var package = new ExcelPackage(file.InputStream))
-                        {
-                            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                            var currentSheet = package.Workbook.Worksheets;
-                            var workSheet = currentSheet.First();
-                            var noOfCol = workSheet.Dimension.End.Column;
-                            var noOfRow = workSheet.Dimension.End.Row;
-                            for (int rowIterator = 2; rowIterator <= noOfRow; rowIterator++)
-                            {
+                    //Save(MapList,fileName,len);
+                        //using (var package = new ExcelPackage(file.InputStream))
+                        //{
+                        //    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                        //    var currentSheet = package.Workbook.Worksheets;
+                        //    var workSheet = currentSheet.First();
+                        //    var noOfCol = workSheet.Dimension.End.Column;
+                        //    var noOfRow = workSheet.Dimension.End.Row;
+                        //    for (int rowIterator = 2; rowIterator <= noOfRow; rowIterator++)
+                        //    {
 
-                                var map = new Map();
-                                map.UserID = Convert.ToInt32(Session["UserID"]);
-                                map.Latitude = lat;
-                                map.Longitude = lng;
-                                map.Address = workSheet.Cells[rowIterator, 3].Value.ToString();
-                                map.ExcelPath = path;
-                                map.FileName = fileName;
-                                map.LastFileName = Request.Cookies["sonYuklenenDosya"].Value;
-                                map.PrevFileName = Request.Cookies["oncekiYuklenenDosya"].Value;
-                                map.BeforeFileName = Request.Cookies["dahaOncekiYuklenenDosya"].Value;
-                                map.ModifyUserId = Convert.ToInt32(Session["UserID"]);
-                                map.ModifyUser = Session["FirstName"].ToString();
-                                map.ModifyDate = DateTime.Now;
-                                map.CreateUserId = Convert.ToInt32(Session["UserID"]);
-                                map.CreateHost = Session["FirstName"].ToString();
-                                map.CreateDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
-                                mapList.Add(map);
-                                map.FileCount = mapList.Count;
-                            }
-                            ViewBag.ExcelPath = path;
-                            ViewBag.Path = path;
-                        }
-                    }
+                        //        var map = new Map();
+                        //        map.Address = workSheet.Cells[rowIterator, 3].Value.ToString();
+                        //        //map.UserID = Convert.ToInt32(Session["UserID"]);
 
+                        //        //map.Address = workSheet.Cells[rowIterator, 3].Value.ToString();
+                        //        //map.LastFileName = Request.Cookies["sonYuklenenDosya"].Value;
+                        //        //map.PrevFileName = Request.Cookies["oncekiYuklenenDosya"].Value;
+                        //        //map.BeforeFileName = Request.Cookies["dahaOncekiYuklenenDosya"].Value;
+                        //        //map.ModifyUserId = Convert.ToInt32(Session["UserID"]);
+                        //        //map.ModifyUser = Session["FirstName"].ToString();
+                        //        //map.ModifyDate = DateTime.Now;
+                        //        //map.CreateUserId = Convert.ToInt32(Session["UserID"]);
+                        //        //map.CreateHost = Session["FirstName"].ToString();
+                        //        //map.CreateDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+                        //        mapList.Add(map);
+                        //        //map.FileCount = mapList.Count;
+                        //    }
+                        //    //ViewBag.ExcelPath = path;
+                        //    //ViewBag.Path = path;
+                        //}
                 }
             }
-            foreach (var item in mapList)
-            {
-                db.Map.Add(item);
-            }
-            db.SaveChanges();
-            ViewBag.Count = mapList.Count();
+            //foreach (var item in mapList)
+            //{
+            //    db.Map.Add(item);
+            //}
+            //db.SaveChanges();
+            //ViewBag.Count = mapList.Count();
             return View(mapList);
 
 
@@ -169,6 +153,143 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
             //return RedirectToAction("Index", "Admin");
         }
 
+        [HttpPost]
+        public ActionResult Save(List<Map> MapList, string fileName, int len)
+        {
+            getArray(MapList, fileName, len);
+            return View();
+        }
+
+        [HttpPost]
+        [ActionName("ArrayToController")]
+        public ActionResult getArray(List<Map> MapList, string fileName, int len)
+        {
+
+            LocationDBEntities db = new LocationDBEntities();
+            List<Map> mapList = new List<Map>();
+            //int uid = Convert.ToInt32(Session["UserID"]);
+            //var isAlreadyExists = db.Map.Where(x => x.UserID == uid && x.FileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)).Any();
+            //if (isAlreadyExists)
+            //{
+            //    TempData["message"] = "Aynı isimde dosya daha önceden kaydedilmiş...";
+            //    return Content(@"<script language='javascript' type='text/javascript'>
+            //             alert('Aynı isimde dosya daha önceden kaydedilmiş...');
+            //             </script>
+            //          ");
+            //}
+            //else
+            //{
+                //loop the MapList
+                foreach (Map m in MapList)
+                {
+                    var map = new Map();
+                    map.UserID = Convert.ToInt32(Session["UserID"]);
+                    map.Latitude = m.Latitude;
+                    map.Longitude = m.Longitude;
+                    map.Address = m.Address;
+                    //map.ExcelPath = path;
+                    map.FileName = m.FileName;
+                    //map.LastFileName = Request.Cookies["sonYuklenenDosya"].Value;
+                    //map.PrevFileName = Request.Cookies["oncekiYuklenenDosya"].Value;
+                    //map.BeforeFileName = Request.Cookies["dahaOncekiYuklenenDosya"].Value;
+                    map.ModifyUserId = Convert.ToInt32(Session["UserID"]);
+                    map.ModifyUser = Session["FirstName"].ToString();
+                    map.ModifyDate = DateTime.Now;
+                    map.CreateUserId = Convert.ToInt32(Session["UserID"]);
+                    map.CreateHost = Session["FirstName"].ToString();
+                    map.CreateDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+                    mapList.Add(map);
+                    map.FileCount = m.FileCount;
+                    foreach (var item in mapList)
+                    {
+                        db.Map.Add(item);
+                    }
+                }
+            //}
+                db.SaveChanges();
+                return Json(mapList,JsonRequestBehavior.AllowGet);
+            //}
+            //LocationDBEntities db = new LocationDBEntities();
+            //List<Map> mapList = new List<Map>();
+            //var isAlreadyExists = db.Map.Where(x => x.FileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)).Any();
+            //if (isAlreadyExists)
+            //{
+            //    TempData["message"] = "Aynı isimde dosya daha önceden kaydedilmiş...";
+            //    return Content("<script language='javascript' type='text/javascript'>alert('Aynı isimde dosya daha önceden kaydedilmiş...');</script>");
+            //}
+            //else
+            //{
+            //    //loop the MapList
+            //    foreach (Map m in MapList)
+            //    {
+            //        var map = new Map();
+            //        map.UserID = Convert.ToInt32(Session["UserID"]);
+            //        map.Latitude = m.Latitude;
+            //        map.Longitude = m.Longitude;
+            //        map.Address = m.Address;
+            //        //map.ExcelPath = path;
+            //        map.FileName = m.FileName;
+            //        map.LastFileName = Request.Cookies["sonYuklenenDosya"].Value;
+            //        map.PrevFileName = Request.Cookies["oncekiYuklenenDosya"].Value;
+            //        map.BeforeFileName = Request.Cookies["dahaOncekiYuklenenDosya"].Value;
+            //        map.ModifyUserId = Convert.ToInt32(Session["UserID"]);
+            //        map.ModifyUser = Session["FirstName"].ToString();
+            //        map.ModifyDate = DateTime.Now;
+            //        map.CreateUserId = Convert.ToInt32(Session["UserID"]);
+            //        map.CreateHost = Session["FirstName"].ToString();
+            //        map.CreateDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+            //        mapList.Add(map);
+            //        map.FileCount = m.FileCount;
+            //    }
+            //    foreach (var item in mapList)
+            //    {
+            //        db.Map.Add(item);
+            //    }
+            //    db.SaveChanges();
+            //    return Json(mapList);
+            //}
+
+        }
+
+        //LocationDBEntities db = new LocationDBEntities();
+        //List<Map> mapList = new List<Map>();
+        //var isAlreadyExists = db.Map.Where(x => x.FileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)).Any();
+        //if (isAlreadyExists)
+        //{
+        //    TempData["message"] = "Aynı isimde dosya daha önceden kaydedilmiş...";
+        //    return Content("<script language='javascript' type='text/javascript'>alert('Aynı isimde dosya daha önceden kaydedilmiş...');</script>");
+        //}
+        //else
+        //{
+        //    //loop the MapList
+        //    foreach (Map m in MapList)
+        //    {
+        //        var map = new Map();
+        //        map.UserID = Convert.ToInt32(Session["UserID"]);
+        //        map.Latitude = m.Latitude;
+        //        map.Longitude = m.Longitude;
+        //        map.Address = m.Address;
+        //        //map.ExcelPath = path;
+        //        map.FileName = m.FileName;
+        //        map.LastFileName = Request.Cookies["sonYuklenenDosya"].Value;
+        //        map.PrevFileName = Request.Cookies["oncekiYuklenenDosya"].Value;
+        //        map.BeforeFileName = Request.Cookies["dahaOncekiYuklenenDosya"].Value;
+        //        map.ModifyUserId = Convert.ToInt32(Session["UserID"]);
+        //        map.ModifyUser = Session["FirstName"].ToString();
+        //        map.ModifyDate = DateTime.Now;
+        //        map.CreateUserId = Convert.ToInt32(Session["UserID"]);
+        //        map.CreateHost = Session["FirstName"].ToString();
+        //        map.CreateDate = Convert.ToDateTime(DateTime.Now.ToShortDateString());
+        //        mapList.Add(map);
+        //        map.FileCount = m.FileCount;
+        //    }
+        //    foreach (var item in mapList)
+        //    {
+        //        db.Map.Add(item);
+        //    }
+        //    db.SaveChanges();
+        //    return Json(mapList);
+        //}
         //public async Task<ActionResult> OnPostUploadAsync(List<IFormFile> files)
         //{
         //    long size = files.Sum(f => f.Length);
@@ -225,9 +346,9 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
             map.Longitude = Map.Longitude;
             map.ExcelPath = null;
             map.FileName = null;
-            map.LastFileName = Request.Form["LastFileName"];
-            map.PrevFileName = Request.Form["PrevFileName"];
-            map.BeforeFileName = Request.Form["BeforeFileName"];
+            //map.LastFileName = Request.Form["LastFileName"];
+            //map.PrevFileName = Request.Form["PrevFileName"];
+            //map.BeforeFileName = Request.Form["BeforeFileName"];
             map.ModifyUserId = Convert.ToInt32(Request.Form["User"]);
             map.ModifyUser = Session["FirstName"].ToString();
             map.ModifyDate = DateTime.Now;
@@ -272,24 +393,121 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
             return View(maps);
         }
 
-        public JsonResult GetMaps()
+
+        public JsonResult GetMapss()
         {
             var userId = Session["UserID"];
             var uid = Convert.ToInt32(userId);
-            var query = from m in _dbContext.Map
-                        where m.UserID == uid
-                        select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName = m.FileName, LastFileName = m.LastFileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount=m.FileCount };
+
+            //var maps = _dbContext.Map.ToList();
+
+            //var query = from m in _dbContext.Map
+            //            where m.FileName == fileName
+            //            select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName = m.FileName, LastFileName = m.LastFileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount = m.FileCount };
+            var query = _dbContext.Map
+                                .Where(x => x.UserID == uid)
+                                .Select(m => new
+                                {
+                                    UserID = uid,
+                                    Latitude = m.Latitude,
+                                    Longitude = m.Longitude,
+                                    Address = m.Address,
+                                    FileName = m.FileName,
+                                    //LastFileName = m.LastFileName,
+                                    CreateHost = m.CreateHost,
+                                    CreateDate = m.CreateDate,
+                                    FileCount = m.FileCount
+                                });
+            //var maps = query.ToList();
+            var maps = query.ToList().Select(r => new Map
+            {
+                UserID = uid,
+                Latitude = r.Latitude,
+                Longitude = r.Longitude,
+                Address = r.Address,
+                FileName = r.FileName,
+                //LastFileName = r.LastFileName,
+                CreateHost = r.CreateHost,
+                CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString()),
+                FileCount = r.FileCount
+            }).ToList();
+
+
+            //var query =
+            //               (from m in _dbContext.Map
+            //                where m.FileName == fileName
+            //                select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName = m.FileName, LastFileName = m.LastFileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount = m.FileCount });
+            //    var maps = query.ToList().Select(r => new Map
+            //    {
+            //        Latitude = r.Latitude,
+            //        Longitude = r.Longitude,
+            //        Address = r.Address,
+            //        FileName = r.FileName,
+            //        LastFileName = r.LastFileName,
+            //        CreateHost = r.CreateHost,
+            //        FileCount = r.FileCount,
+            //        CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString())
+            //    }).ToList();
+
+
+            return Json(maps, JsonRequestBehavior.AllowGet);
+        }
+
+
+
+        public JsonResult GetMaps(string fileName)
+        {
+            var userId = Session["UserID"];
+            var uid = Convert.ToInt32(userId);
+
+            //var maps = _dbContext.Map.ToList();
+
+            //var query = from m in _dbContext.Map
+            //            where m.FileName == fileName
+            //            select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName = m.FileName, LastFileName = m.LastFileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount = m.FileCount };
+            var query = _dbContext.Map
+                                .Where(x => x.UserID == uid && x.FileName == fileName)
+                                .Select(m => new
+                                {
+                                    Latitude = m.Latitude,
+                                    Longitude = m.Longitude,
+                                    Address = m.Address,
+                                    FileName = m.FileName,
+                                    //LastFileName = m.LastFileName,
+                                    CreateHost = m.CreateHost,
+                                    CreateDate = m.CreateDate,
+                                    FileCount = m.FileCount
+                                });
+            //var maps = query.ToList();
             var maps = query.ToList().Select(r => new Map
             {
                 Latitude = r.Latitude,
                 Longitude = r.Longitude,
                 Address = r.Address,
                 FileName = r.FileName,
-                LastFileName = r.LastFileName,
+                //LastFileName = r.LastFileName,
                 CreateHost = r.CreateHost,
-                FileCount = r.FileCount,
-                CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString())
+                CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString()),
+                FileCount = r.FileCount
             }).ToList();
+
+
+            //var query =
+            //               (from m in _dbContext.Map
+            //                where m.FileName == fileName
+            //                select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName = m.FileName, LastFileName = m.LastFileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount = m.FileCount });
+            //    var maps = query.ToList().Select(r => new Map
+            //    {
+            //        Latitude = r.Latitude,
+            //        Longitude = r.Longitude,
+            //        Address = r.Address,
+            //        FileName = r.FileName,
+            //        LastFileName = r.LastFileName,
+            //        CreateHost = r.CreateHost,
+            //        FileCount = r.FileCount,
+            //        CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString())
+            //    }).ToList();
+
 
             return Json(maps, JsonRequestBehavior.AllowGet);
         }
@@ -305,30 +523,30 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
             DateTime.TryParse(eDs, out end);
             var userId = Session["UserID"];
             var uid = Convert.ToInt32(userId);
-            List<Map> model = null;
             //var mapsData = from m in dbContext.Map where m.UserId == uid select m;
-            var query = from m in _dbContext.Map
-                        where m.UserID == uid
-                        select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName=m.FileName, LastFileName = m.LastFileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount = m.FileCount };
-            var maps = query.ToList().Select(r => new Map
+            List<Map> mapList = new List<Map>();
+            var query = (from m in _dbContext.Map
+                         where m.UserID == uid
+                         select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName = m.FileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount = m.FileCount });
+            mapList = query.ToList().Select(r => new Map
             {
                 Latitude = r.Latitude,
                 Longitude = r.Longitude,
                 Address = r.Address,
                 FileName = r.FileName,
-                LastFileName = r.LastFileName,
+                //LastFileName = r.LastFileName,
                 CreateHost = r.CreateHost,
+                CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString()),
                 FileCount = r.FileCount,
-                CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString())
             }).ToList();
+
 
             if (start != DateTime.MinValue && end != DateTime.MinValue)
             {
-                model = model.Where(x => x.CreateDate >= start.Date && x.CreateDate <= end.Date).ToList();
-                return Json(model, JsonRequestBehavior.AllowGet);
+                mapList = mapList.Where(x => Convert.ToDateTime(x.CreateDate) >= start && Convert.ToDateTime(x.CreateDate) <= end).ToList();
             }
 
-            return Json(maps, JsonRequestBehavior.AllowGet);
+            return Json(mapList, JsonRequestBehavior.AllowGet);
             //using (var client = new HttpClient())
             //{
             //    userid = Convert.ToInt32(Session["UserID"]);
@@ -371,11 +589,31 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
 
           });
 
-            var maps = _dbContext.Map.Where(x => x.UserID == uid).OrderByDescending(x => x.CreateDate).Take(50000).ToList();
-
-            foreach (var map in maps)
+            List<Map> mapList = new List<Map>();
+            var query = (from m in _dbContext.Map
+                         where m.UserID == uid
+                         select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName = m.FileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount = m.FileCount });
+            mapList = query.ToList().Select(r => new Map
             {
-                dtMaps.Rows.Add(map.Latitude, map.Longitude, map.Address, map.CreateDate.Value);
+                Latitude = r.Latitude.ToString(),
+                Longitude = r.Longitude.ToString(),
+                Address = r.Address,
+                FileName = r.FileName,
+                //LastFileName = r.LastFileName,
+                CreateHost = r.CreateHost,
+                CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString()),
+                FileCount = r.FileCount
+            }).OrderByDescending(x => x.CreateDate).Take(50000).ToList();
+
+            //var maps = _dbContext.Map.Where(x => x.UserID == uid).OrderByDescending(x => x.CreateDate).Take(50000).ToList();
+
+            foreach (var map in mapList)
+            {
+                //double d = Convert.ToDouble(map.Latitude);
+                //string s = d.ToString("0:0,0");
+                //double dd = Convert.ToDouble(map.Longitude);
+                //string ss = dd.ToString("0:0,0");
+                dtMaps.Rows.Add(map.Latitude.ToString().Replace('.', ','), map.Longitude.ToString().Replace('.', ','), map.Address, map.CreateDate.Value.ToShortDateString());
             }
 
 
@@ -447,11 +685,51 @@ namespace AWSServerless_Google_Geocoding_Mvc.Controllers
 
           });
 
-            var maps = _dbContext.Map.Where(x => x.UserID == uid && x.FileName == lastFile).OrderByDescending(x => x.CreateDate).Take(50000).ToList();
-
-            foreach (var map in maps)
+            List<Map> mapList = new List<Map>();
+            var query = (from m in _dbContext.Map
+                         where m.UserID == uid && m.FileName == lastFile
+                         select new { Latitude = m.Latitude, Longitude = m.Longitude, Address = m.Address, FileName = m.FileName, CreateHost = m.CreateHost, CreateDate = m.CreateDate, FileCount = m.FileCount });
+            mapList = query.ToList().Select(r => new Map
             {
-                dtMaps.Rows.Add(map.Latitude, map.Longitude, map.Address, map.CreateDate.Value);
+                Latitude = r.Latitude,
+                Longitude = r.Longitude,
+                Address = r.Address,
+                FileName = r.FileName,
+                //LastFileName = r.LastFileName,
+                CreateHost = r.CreateHost,
+                CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString()),
+                FileCount = r.FileCount
+            }).ToList();
+
+
+            var isAlreadyExists = _dbContext.Map.Where(x => x.FileName.Equals(lastFile, StringComparison.InvariantCultureIgnoreCase)).Any();
+
+            if (isAlreadyExists)
+            {
+                mapList = query.ToList().Select(r => new Map
+                {
+                    Latitude = r.Latitude,
+                    Longitude = r.Longitude,
+                    Address = r.Address,
+                    FileName = r.FileName,
+                    //LastFileName = r.LastFileName,
+                    CreateHost = r.CreateHost,
+                    CreateDate = Convert.ToDateTime(r.CreateDate.Value.ToShortDateString()),
+                    FileCount = r.FileCount
+                }).ToList();
+
+                foreach (var map in mapList)
+                {
+                    dtMaps.Rows.Add(map.Latitude.ToString().Replace('.', ','), map.Longitude.ToString().Replace('.', ','), map.Address, map.CreateDate.Value.ToShortDateString());
+                }
+            }
+            else
+            {
+                var maps = _dbContext.Map.Where(x => x.UserID == uid && x.FileName == lastFile).OrderByDescending(x => x.CreateDate).Take(50000).ToList();
+                foreach (var map in maps)
+                {
+                    dtMaps.Rows.Add(map.Latitude.ToString().Replace('.', ','), map.Longitude.ToString().Replace('.', ','), map.Address, map.CreateDate.Value.ToShortDateString());
+                }
             }
 
 

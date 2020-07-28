@@ -12,9 +12,6 @@
     <Property Name="Address" Type="nvarchar(max)" />
     <Property Name="ExcelPath" Type="nvarchar(max)" />
     <Property Name="FileName" Type="nvarchar(max)" />
-    <Property Name="LastFileName" Type="nvarchar(max)" />
-    <Property Name="PrevFileName" Type="nvarchar(max)" />
-    <Property Name="BeforeFileName" Type="nvarchar(max)" />
     <Property Name="FileCount" Type="int" />
     <Property Name="ModifyUserId" Type="int" />
     <Property Name="ModifyUser" Type="nvarchar(max)" />

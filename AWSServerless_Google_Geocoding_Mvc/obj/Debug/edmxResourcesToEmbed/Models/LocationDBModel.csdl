@@ -20,9 +20,6 @@
     <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="ExcelPath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="FileName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-    <Property Name="LastFileName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-    <Property Name="PrevFileName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-    <Property Name="BeforeFileName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="FileCount" Type="Int32" />
     <Property Name="ModifyUserId" Type="Int32" />
     <Property Name="ModifyUser" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />

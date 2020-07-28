@@ -22,9 +22,6 @@ namespace AWSServerless_Google_Geocoding_Mvc.Models
         public string Address { get; set; }
         public string ExcelPath { get; set; }
         public string FileName { get; set; }
-        public string LastFileName { get; set; }
-        public string PrevFileName { get; set; }
-        public string BeforeFileName { get; set; }
         public Nullable<int> FileCount { get; set; }
         public Nullable<int> ModifyUserId { get; set; }
         public string ModifyUser { get; set; }
